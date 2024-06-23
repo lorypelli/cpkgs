@@ -1,0 +1,8 @@
+{
+    "compiler": "gcc",
+    "fileName": "test",
+    "include": {
+        "c": [],
+        "h": []
+    }
+}
