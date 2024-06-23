@@ -97,8 +97,9 @@ func main() {
 					log.Fatal("Currently only github is supported!")
 					return
 				}
+				fmt.Printf("Specify headers file to add from '%s': ", strings.TrimPrefix(strings.ReplaceAll(u.Path, u.Host, ""), "/"))
 				u.Host = "raw.githubusercontent.com"
-				fmt.Printf("Specify headers file to add from %s ", u.Path)
+				urlString := strings.ReplaceAll(u.String(), "/github.com", "")
 				scanner.Scan()
 				h := scanner.Text()
 				if len(strings.TrimSpace(h)) <= 0 {
@@ -111,14 +112,14 @@ func main() {
 						fmt.Printf("%s is not a valid header file\n", headers[i])
 						continue
 					}
-					res, err := http.Get(fmt.Sprintf("%s/main/%s", u.String(), headers[i+c]))
+					res, err := http.Get(fmt.Sprintf("%s/main/%s", urlString, headers[i+c]))
 					for res.StatusCode != 200 || err != nil {
 						var choice string
-						fmt.Println("Before skipping this header file, do you want to try searching it in the include directory? (Y/n)")
+						fmt.Print("Before skipping this header file, do you want to try searching it in the include directory? (Y/n) ")
 						fmt.Scan(&choice)
 						if strings.ToLower(choice) == "y" {
 							fmt.Println("Searching...")
-							res, err = http.Get(fmt.Sprintf("%s/main/%s", u.String(), headers[i+c]))
+							res, err = http.Get(fmt.Sprintf("%s/main/include/%s", urlString, headers[i+c]))
 							if res.StatusCode != 200 || err != nil {
 								fmt.Printf("Unable to get %s header file, skipping...\n", headers[i+c])
 							}
@@ -129,7 +130,7 @@ func main() {
 						if i+c >= len(headers) {
 							break
 						}
-						res, err = http.Get(fmt.Sprintf("%s/main/%s", u.String(), headers[i+c]))
+						res, err = http.Get(fmt.Sprintf("%s/main/%s", urlString, headers[i+c]))
 					}
 					defer res.Body.Close()
 					body, err := io.ReadAll(res.Body)
@@ -137,12 +138,30 @@ func main() {
 						log.Fatal(err)
 						return
 					}
-					err = os.Mkdir("cpkgs", 0777)
+					_, err = os.Stat("cpkgs")
+					if os.IsNotExist(err) {
+						err = os.Mkdir("cpkgs", 0777)
+						if err != nil {
+							log.Fatal(err)
+							return
+						}
+					}
+					os.WriteFile(fmt.Sprintf("cpkgs/%s", headers[i]), body, 0777)
+					code := strings.ReplaceAll(headers[i], ".h", ".c")
+					res, err = http.Get(fmt.Sprintf("%s/main/%s", urlString, strings.ReplaceAll(headers[i], ".h", ".c")))
+					for res.StatusCode != 200 || err != nil {
+						var dir string
+						fmt.Print("File not found, provide directory: ")
+						fmt.Scan(&dir)
+						res, err = http.Get(fmt.Sprintf("%s/main/%s/%s", u.String(), dir, headers[i]))
+					}
+					defer res.Body.Close()
+					body, err = io.ReadAll(res.Body)
 					if err != nil {
 						log.Fatal(err)
 						return
 					}
-					os.WriteFile(fmt.Sprintf("cpkgs/%s", headers[i]), body, 0777)
+					os.WriteFile(fmt.Sprintf("cpkgs/%s", code), body, 0777)
 				}
 			}
 			break
