@@ -79,7 +79,14 @@ func main() {
 		}
 	case "add":
 		{
+			dir, _ := os.Getwd()
+			_, err := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
 			pkgs := flag.Args()[1:]
+			scanner := bufio.NewScanner(os.Stdin)
 			for i := 0; i < len(pkgs); i++ {
 				u, _ := url.Parse(pkgs[i])
 				if len(u.Scheme) <= 0 || len(u.Host) <= 0 {
@@ -91,10 +98,12 @@ func main() {
 					return
 				}
 				u.Host = "raw.githubusercontent.com"
-				scanner := bufio.NewScanner(os.Stdin)
 				fmt.Printf("Specify headers file to add from %s ", u.Path)
 				scanner.Scan()
 				h := scanner.Text()
+				if len(strings.TrimSpace(h)) <= 0 {
+					continue
+				}
 				headers := strings.Split(h, " ")
 				c := 0
 				for i := 0; i < len(headers); i++ {
@@ -120,7 +129,6 @@ func main() {
 						if i+c >= len(headers) {
 							break
 						}
-						fmt.Println(headers[i+c])
 						res, err = http.Get(fmt.Sprintf("%s/main/%s", u.String(), headers[i+c]))
 					}
 					defer res.Body.Close()
@@ -129,7 +137,12 @@ func main() {
 						log.Fatal(err)
 						return
 					}
-					fmt.Println(string(body))
+					err = os.Mkdir("cpkgs", 0777)
+					if err != nil {
+						log.Fatal(err)
+						return
+					}
+					os.WriteFile(fmt.Sprintf("cpkgs/%s", headers[i]), body, 0777)
 				}
 			}
 			break

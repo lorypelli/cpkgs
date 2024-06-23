@@ -1,0 +1,4 @@
+{
+    "exec": "go build -o tests/cpkgs.exe main.go",
+    "ext": "go"
+}
