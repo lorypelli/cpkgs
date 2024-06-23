@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
@@ -86,9 +89,46 @@ func main() {
 				return
 			}
 			u.Host = "raw.githubusercontent.com"
-			var h string
+			scanner := bufio.NewScanner(os.Stdin)
 			fmt.Printf("Specify headers file to add from %s ", u.Path)
-			fmt.Scan(&h)
+			scanner.Scan()
+			h := scanner.Text()
+			headers := strings.Split(h, " ")
+			c := 0
+			for i := 0; i < len(headers); i++ {
+				if !strings.HasSuffix(headers[i], "h") {
+					fmt.Printf("%s is not a valid header file\n", headers[i])
+					continue
+				}
+				res, err := http.Get(fmt.Sprintf("%s/main/%s", u.String(), headers[i+c]))
+				for res.StatusCode != 200 || err != nil {
+					var choice string
+					fmt.Println("Before skipping this header file, do you want to try searching it in the include directory? (Y/n)")
+					fmt.Scan(&choice)
+					if strings.ToLower(choice) == "y" {
+						fmt.Println("Searching...")
+						res, err = http.Get(fmt.Sprintf("%s/main/%s", u.String(), headers[i+c]))
+						if res.StatusCode != 200 || err != nil {
+							fmt.Printf("Unable to get %s header file, skipping...\n", headers[i+c])
+						}
+					} else {
+						fmt.Printf("Unable to get %s header file, skipping...\n", headers[i+c])
+					}
+					c++
+					if i+c >= len(headers) {
+						break
+					}
+					fmt.Println(headers[i+c])
+					res, err = http.Get(fmt.Sprintf("%s/main/%s", u.String(), headers[i+c]))
+				}
+				defer res.Body.Close()
+				body, err := io.ReadAll(res.Body)
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
+				fmt.Println(string(body))
+			}
 		}
 		break
 	}
