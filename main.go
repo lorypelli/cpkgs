@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -25,10 +27,13 @@ func main() {
 	flag.Parse()
 	switch flag.Arg(0) {
 	case "run": {
-		arr := strings.Split(flag.Arg(1), "/")
-		file := arr[len(arr)-1]
-		p := arr[:len(arr)-1]
-		path := strings.Join(p, "/")
+		f := filepath.Clean(flag.Arg(1))
+		file, err := filepath.Abs(f)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		path := strings.ReplaceAll(filepath.Dir(file), "\\", "/")
 		files, err := os.ReadDir(path)
 		if err != nil {
 			log.Fatal(err)
@@ -40,23 +45,31 @@ func main() {
 			return
 		}
 		var JSON JSON
-		json.Unmarshal(j, &JSON)
+		err = json.Unmarshal(j, &JSON)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
 		if runtime.GOOS == "windows" {
 			JSON.FileName += ".exe"
 		}
 		fname := JSON.FileName
-		if len(path) > 0 {
-			file = path + "/" + file
-			fname = path + "/" + JSON.FileName
-		}
-		cmd := fmt.Sprintf("%s -o %s %s", JSON.Compiler, fname, file)
+		cmd := fmt.Sprintf("cd %s && %s -o %s", path, JSON.Compiler, fname)
 		for i := 0; i < len(files); i++ {
-			if strings.HasSuffix(files[i].Name(), ".c") && files[i].Name() != file {
+			if strings.HasSuffix(files[i].Name(), ".c") {
 				cmd += fmt.Sprintf(" %s", files[i].Name())
 			}
 		}
-		cmd += fmt.Sprintf(" && %s", fname)
-		fmt.Println(cmd)
+		cmd += fmt.Sprintf(" && %s", JSON.FileName)
+		cmdExec, err := exec.Command("sh", "-c", cmd).CombinedOutput()
+		if runtime.GOOS == "windows" {
+			cmdExec, err = exec.Command("cmd", "/C", cmd).CombinedOutput()
+		}
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		fmt.Println(string(cmdExec))
 		break
 	}
 	}
