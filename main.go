@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -70,6 +71,25 @@ func main() {
 			return
 		}
 		fmt.Println(string(cmdExec))
+		break
+	}
+	case "add": {
+		pkgs := flag.Args()[1:]
+		for i := 0; i < len(pkgs); i++ {
+			u, _ := url.Parse(pkgs[i])
+			if len(u.Scheme) <= 0 || len(u.Host) <= 0 {
+				u.Scheme = "https"
+				u.Host = "github.com"
+			}
+			if u.Host != "github.com" {
+				log.Fatal("Currently only github is supported!")
+				return
+			}
+			u.Host = "raw.githubusercontent.com"
+			var h string
+			fmt.Printf("Specify headers file to add from %s ", u.Path)
+			fmt.Scan(&h)
+		}
 		break
 	}
 	}
