@@ -17,9 +17,9 @@ import (
 )
 
 type JSON struct {
-	Compiler string
-	FileName string
-	Include  Include
+	Compiler string  `json:"compiler"`
+	FileName string  `json:"file_name"`
+	Include  Include `json:"include"`
 }
 
 type Include struct {
@@ -29,9 +29,26 @@ type Include struct {
 
 func main() {
 	flag.Parse()
+	dir, _ := os.Getwd()
+	j, e := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
+	if e != nil {
+		log.Fatal(e)
+		return
+	}
+	var JSON JSON
+	err := json.Unmarshal(j, &JSON)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 	switch flag.Arg(0) {
 	case "run":
 		{
+			_, err := os.Getwd()
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
 			f := filepath.Clean(flag.Arg(1))
 			file, err := filepath.Abs(f)
 			if err != nil {
@@ -39,52 +56,37 @@ func main() {
 				return
 			}
 			path := strings.ReplaceAll(filepath.Dir(file), "\\", "/")
-			files, err := os.ReadDir(path)
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-			j, err := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", path))
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-			var JSON JSON
-			err = json.Unmarshal(j, &JSON)
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
 			if runtime.GOOS == "windows" {
 				JSON.FileName += ".exe"
 			}
 			fname := JSON.FileName
-			cmd := fmt.Sprintf("cd %s && %s -o %s", path, JSON.Compiler, fname)
-			for i := 0; i < len(files); i++ {
-				if strings.HasSuffix(files[i].Name(), ".c") {
-					cmd += fmt.Sprintf(" %s", files[i].Name())
-				}
+			cmd := fmt.Sprintf("cd %s && %s -o %s %s", path, JSON.Compiler, fname, strings.Join(flag.Args()[1:], " "))
+			if flag.Arg(1) == "-e" {
+				cmd = fmt.Sprintf("cd %s && %s -o %s %s", path, JSON.Compiler, fname, strings.Join(flag.Args()[2:], " "))
 			}
-			cmd += fmt.Sprintf(" && %s", JSON.FileName)
-			cmdExec, err := exec.Command("sh", "-c", cmd).CombinedOutput()
-			if runtime.GOOS == "windows" {
-				cmdExec, err = exec.Command("cmd", "/C", cmd).CombinedOutput()
-			}
+			files, err := os.ReadDir(fmt.Sprintf("%s/cpkgs", path))
 			if err != nil {
 				log.Fatal(err)
 				return
 			}
-			fmt.Println(string(cmdExec))
+			for i := 0; i < len(files); i++ {
+				if strings.HasSuffix(files[i].Name(), ".c") {
+					cmd += fmt.Sprintf(" cpkgs/%s", files[i].Name())
+				}
+			}
+			cmd += fmt.Sprintf(" && %s", JSON.FileName)
+			cmdExec := exec.Command("sh", "-c", cmd)
+			if runtime.GOOS == "windows" {
+				cmdExec = exec.Command("cmd", "/C", cmd)
+			}
+			cmdExec.Stdin = os.Stdin
+			cmdExec.Stdout = os.Stdout
+			cmdExec.Stderr = os.Stderr
+			cmdExec.Run()
 			break
 		}
 	case "add":
 		{
-			dir, _ := os.Getwd()
-			_, err := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
 			pkgs := flag.Args()[1:]
 			scanner := bufio.NewScanner(os.Stdin)
 			for i := 0; i < len(pkgs); i++ {
@@ -118,7 +120,6 @@ func main() {
 						fmt.Print("Before skipping this header file, do you want to try searching it in the include directory? (Y/n) ")
 						fmt.Scan(&choice)
 						if strings.ToLower(choice) == "y" {
-							fmt.Println("Searching...")
 							res, err = http.Get(fmt.Sprintf("%s/main/include/%s", urlString, headers[i+c]))
 							if res.StatusCode != 200 || err != nil {
 								fmt.Printf("Unable to get %s header file, skipping...\n", headers[i+c])
@@ -147,6 +148,7 @@ func main() {
 						}
 					}
 					os.WriteFile(fmt.Sprintf("cpkgs/%s", headers[i]), body, 0777)
+					JSON.Include.H = append(JSON.Include.H, res.Request.URL.String())
 					code := strings.ReplaceAll(headers[i], ".h", ".c")
 					res, err = http.Get(fmt.Sprintf("%s/main/%s", urlString, strings.ReplaceAll(headers[i], ".h", ".c")))
 					for res.StatusCode != 200 || err != nil {
@@ -162,6 +164,13 @@ func main() {
 						return
 					}
 					os.WriteFile(fmt.Sprintf("cpkgs/%s", code), body, 0777)
+					JSON.Include.C = append(JSON.Include.C, res.Request.URL.String())
+					j, err := json.Marshal(JSON)
+					if err != nil {
+						log.Fatal(err)
+						return
+					}
+					os.WriteFile("cpkgs.json", j, 0777)
 				}
 			}
 			break

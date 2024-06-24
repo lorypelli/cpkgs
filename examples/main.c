@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include "cpkgs/input.h"
 
 int main(void) {
-    printf("Hello World\n");
+    str s = s_in("Provide string: ");
+    printf("%s", s);
     return 0;
 }

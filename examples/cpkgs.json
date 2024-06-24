@@ -1,8 +1,1 @@
-{
-    "compiler": "gcc",
-    "fileName": "test",
-    "include": {
-        "c": [],
-        "h": []
-    }
-}
+{"compiler":"gcc","file_name":"","include":{"C":["https://raw.githubusercontent.com/lorypelli/input_function/main/input.c"],"H":["https://raw.githubusercontent.com/lorypelli/input_function/main/input.h"]}}
