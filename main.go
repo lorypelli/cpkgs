@@ -114,13 +114,16 @@ func main() {
 						fmt.Printf("%s is not a valid header file\n", headers[i])
 						continue
 					}
-					res, err := http.Get(fmt.Sprintf("%s/main/%s", urlString, headers[i+c]))
+					res, err := http.Get(fmt.Sprintf("%s/master/%s", urlString, headers[i+c]))
 					for res.StatusCode != 200 || err != nil {
 						var choice string
 						fmt.Print("Before skipping this header file, do you want to try searching it in the include directory? (Y/n) ")
-						fmt.Scan(&choice)
+						fmt.Scanln(&choice)
+						if len(choice) <= 0 {
+							choice = "y"
+						}
 						if strings.ToLower(choice) == "y" {
-							res, err = http.Get(fmt.Sprintf("%s/main/include/%s", urlString, headers[i+c]))
+							res, err = http.Get(fmt.Sprintf("%s/master/include/%s", urlString, headers[i+c]))
 							if res.StatusCode != 200 || err != nil {
 								fmt.Printf("Unable to get %s header file, skipping...\n", headers[i+c])
 							}
@@ -131,7 +134,7 @@ func main() {
 						if i+c >= len(headers) {
 							break
 						}
-						res, err = http.Get(fmt.Sprintf("%s/main/%s", urlString, headers[i+c]))
+						res, err = http.Get(fmt.Sprintf("%s/master/%s", urlString, headers[i+c]))
 					}
 					defer res.Body.Close()
 					body, err := io.ReadAll(res.Body)
@@ -150,12 +153,12 @@ func main() {
 					os.WriteFile(fmt.Sprintf("cpkgs/%s", headers[i]), body, 0777)
 					JSON.Include.H = append(JSON.Include.H, res.Request.URL.String())
 					code := strings.ReplaceAll(headers[i], ".h", ".c")
-					res, err = http.Get(fmt.Sprintf("%s/main/%s", urlString, strings.ReplaceAll(headers[i], ".h", ".c")))
+					res, err = http.Get(fmt.Sprintf("%s/master/%s", urlString, strings.ReplaceAll(headers[i], ".h", ".c")))
 					for res.StatusCode != 200 || err != nil {
 						var dir string
-						fmt.Print("File not found, provide directory: ")
+						fmt.Print("C code file not found, please provide directory: ")
 						fmt.Scan(&dir)
-						res, err = http.Get(fmt.Sprintf("%s/main/%s/%s", u.String(), dir, headers[i]))
+						res, err = http.Get(fmt.Sprintf("%s/master/%s/%s", u.String(), dir, headers[i]))
 					}
 					defer res.Body.Close()
 					body, err = io.ReadAll(res.Body)
@@ -173,6 +176,35 @@ func main() {
 					os.WriteFile("cpkgs.json", j, 0777)
 				}
 			}
+			break
+		}
+	case "init":
+		{
+			var compiler, filename string
+			fmt.Print("Specify the compiler to use: ")
+			fmt.Scanln(&compiler)
+			if len(strings.TrimSpace(compiler)) <= 0 {
+				fmt.Println("Using default...(gcc)")
+				compiler = "gcc"
+			}
+			JSON.Compiler = compiler
+			fmt.Print("Specify the output filename: ")
+			fmt.Scanln(&filename)
+			if len(strings.TrimSpace(filename)) <= 0 {
+				fmt.Println("Using default...(out)")
+				filename = "out"
+			}
+			JSON.FileName = filename
+			j, err := json.Marshal(JSON)
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+			os.WriteFile("cpkgs.json", j, 0777)
+			break
+		}
+	case "install":
+		{
 			break
 		}
 	}
