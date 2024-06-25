@@ -29,17 +29,27 @@ type Include struct {
 
 func main() {
 	flag.Parse()
-	dir, _ := os.Getwd()
-	j, e := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
-	if e != nil {
-		log.Fatal(e)
-		return
-	}
-	var JSON JSON
-	err := json.Unmarshal(j, &JSON)
+	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 		return
+	}
+	_, e := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
+	if os.IsNotExist(e) {
+		var JSON JSON
+		JSON.Include.C = []string{}
+		JSON.Include.H = []string{}
+		j, _ := json.Marshal(JSON)
+		os.WriteFile("cpkgs.json", j, 0777)
+	}
+	var JSON JSON
+	j, _ := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
+	err = json.Unmarshal(j, &JSON)
+	if err != nil {
+		JSON.Include.C = []string{}
+		JSON.Include.H = []string{}
+		j, _ := json.Marshal(JSON)
+		os.WriteFile("cpkgs.json", j, 0777)
 	}
 	switch flag.Arg(0) {
 	case "run":
@@ -61,9 +71,6 @@ func main() {
 			}
 			fname := JSON.FileName
 			cmd := fmt.Sprintf("cd %s && %s -o %s %s", path, JSON.Compiler, fname, strings.Join(flag.Args()[1:], " "))
-			if flag.Arg(1) == "-e" {
-				cmd = fmt.Sprintf("cd %s && %s -o %s %s", path, JSON.Compiler, fname, strings.Join(flag.Args()[2:], " "))
-			}
 			files, err := os.ReadDir(fmt.Sprintf("%s/cpkgs", path))
 			if err != nil {
 				log.Fatal(err)
@@ -180,6 +187,7 @@ func main() {
 		}
 	case "init":
 		{
+			os.WriteFile("cpkgs.json", j, 0777)
 			var compiler, filename string
 			fmt.Print("Specify the compiler to use: ")
 			fmt.Scanln(&compiler)
@@ -205,7 +213,60 @@ func main() {
 		}
 	case "install":
 		{
+			_, err = os.Stat("cpkgs")
+			if os.IsNotExist(err) {
+				err = os.Mkdir("cpkgs", 0777)
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
+			}
+			for i := 0; i < len(JSON.Include.H); i++ {
+				res, err := http.Get(JSON.Include.H[i])
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
+				defer res.Body.Close()
+				body, err := io.ReadAll(res.Body)
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
+				filename := strings.Split(JSON.Include.H[i], "/")
+				os.WriteFile(fmt.Sprintf("%s/cpkgs/%s", dir, filename[len(filename)-1]), body, 0777)
+				res, err = http.Get(JSON.Include.C[i])
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
+				defer res.Body.Close()
+				body, err = io.ReadAll(res.Body)
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
+				filename = strings.Split(JSON.Include.C[i], "/")
+				os.WriteFile(fmt.Sprintf("%s/cpkgs/%s", dir, filename[len(filename)-1]), body, 0777)
+			}
 			break
+		}
+	case "help":
+		{
+			fmt.Println("List of all commands:")
+			fmt.Print("\n")
+			fmt.Println("---------------------------------------------------------------------------")
+			fmt.Println("|'cpkgs init' - initialize a new project using cpkgs                      |")
+			fmt.Println("|'cpkgs add <package-name>' - add C packages using cpkgs                  |")
+			fmt.Println("|'cpkgs install' - install all the packages in the current project        |")
+			fmt.Println("|'cpkgs run <file-name>' - run the file name using your selected compiler |")
+			fmt.Println("|'cpkgs help' - show this menu                                            |")
+			fmt.Println("---------------------------------------------------------------------------")
+			fmt.Print("\n")
+		}
+	default:
+		{
+			log.Fatal("Unknown command, to see all avaible commands type: 'cpkgs help' ")
 		}
 	}
 }
