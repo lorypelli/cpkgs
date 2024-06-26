@@ -58,6 +58,7 @@ func Add() {
 			}
 		}
 		if found {
+			fmt.Println("Header file already exists, skipping...")
 			continue
 		}
 		headers := strings.Split(h, " ")
@@ -139,6 +140,7 @@ func Add() {
 				log.Fatal(err)
 				return
 			}
+			fmt.Printf("Successfully added header file %s!\n", headers[i])
 		}
 	}
 }

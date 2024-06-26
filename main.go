@@ -3,7 +3,6 @@ package main
 import (
 	cmds "cpkgs/cmd"
 	"flag"
-	"fmt"
 	"log"
 	"strings"
 )
@@ -11,12 +10,8 @@ import (
 func main() {
 	flag.Parse()
 	cmd := flag.Arg(0)
-	fmt.Print("\n")
 	if len(strings.TrimSpace(cmd)) <= 0 {
-		var c string
-		fmt.Print("Provide a command to run: ")
-		fmt.Scan(&c)
-		cmd = c
+		cmd = "install"
 	}
 	switch cmd {
 	case "add":

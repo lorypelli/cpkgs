@@ -72,4 +72,8 @@ func Init() {
 		log.Fatal(err)
 		return
 	}
+	fmt.Println("Successfully created file cpkgs.json with the following settings:")
+	fmt.Print("\n")
+	fmt.Printf("Compiler -> %s\n", compiler)
+	fmt.Printf("Filename -> %s\n", filename)
 }

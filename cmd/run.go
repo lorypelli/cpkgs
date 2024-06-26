@@ -33,6 +33,14 @@ func Run() {
 		JSON.FileName += ".exe"
 	}
 	fname := JSON.FileName
+	_, err = os.Stat("cpkgs")
+	if os.IsNotExist(err) {
+		err = os.Mkdir("cpkgs", 0777)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+	}
 	_, err = os.Stat("cpkgs/bin")
 	if os.IsNotExist(err) {
 		err = os.Mkdir("cpkgs/bin", 0777)
