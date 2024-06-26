@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"cpkgs/pkg"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,6 +10,8 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/lorypelli/cpkgs/pkg"
 )
 
 func Run() {

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bufio"
-	"cpkgs/pkg"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -12,6 +11,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/lorypelli/cpkgs/pkg"
 )
 
 func Add() {

@@ -1,10 +1,11 @@
 package main
 
 import (
-	cmds "cpkgs/cmd"
 	"flag"
 	"log"
 	"strings"
+
+	cmds "github.com/lorypelli/cpkgs/cmd"
 )
 
 func main() {

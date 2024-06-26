@@ -1,13 +1,14 @@
 package cmd
 
 import (
-	"cpkgs/pkg"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/lorypelli/cpkgs/pkg"
 )
 
 func Install() {

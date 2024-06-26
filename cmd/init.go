@@ -1,13 +1,14 @@
 package cmd
 
 import (
-	"cpkgs/pkg"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/lorypelli/cpkgs/pkg"
 )
 
 func Init() {
