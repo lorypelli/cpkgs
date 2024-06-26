@@ -131,7 +131,7 @@ func Add() {
 				return
 			}
 			JSON.Include.C = append(JSON.Include.C, res.Request.URL.String())
-			j, err := json.Marshal(JSON)
+			j, err := json.MarshalIndent(JSON, "", "  ")
 			if err != nil {
 				log.Fatal(err)
 				return

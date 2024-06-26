@@ -29,19 +29,6 @@ func Init() {
 	if os.IsNotExist(e) {
 		os.Mkdir(dir, 0777)
 	}
-	_, e = os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
-	if os.IsNotExist(e) {
-		err = os.WriteFile("cpkgs.json", j, 0777)
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-	}
-	err = os.WriteFile(fmt.Sprintf("%s/cpkgs.json", dir), j, 0777)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
 	var compiler, filename string
 	if d != "-d" {
 		fmt.Print("Provide the compiler to use: ")
@@ -63,7 +50,11 @@ func Init() {
 	}
 	JSON.Compiler = compiler
 	JSON.FileName = filename
-	j, err = json.Marshal(JSON)
+	JSON.Include = pkg.Include{
+		C: []string{},
+		H: []string{},
+	}
+	j, err = json.MarshalIndent(JSON, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 		return

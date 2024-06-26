@@ -1,1 +1,12 @@
-{"compiler":"gcc","file_name":"test","include":{"C":["https://raw.githubusercontent.com/lorypelli/input_function/master/input.c"],"H":["https://raw.githubusercontent.com/lorypelli/input_function/master/input.h"]}}
+{
+  "compiler": "gcc",
+  "file_name": "test",
+  "include": {
+    "C": [
+      "https://raw.githubusercontent.com/lorypelli/input_function/master/input.c"
+    ],
+    "H": [
+      "https://raw.githubusercontent.com/lorypelli/input_function/master/input.h"
+    ]
+  }
+}
