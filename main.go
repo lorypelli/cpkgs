@@ -42,6 +42,7 @@ func main() {
 	default:
 		{
 			log.Fatal("Unknown command, to see all avaible commands type: 'cpkgs help' ")
+			break
 		}
 	}
 }

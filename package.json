@@ -1,0 +1,25 @@
+{
+  "name": "cpkgs",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "repository": {
+    "url": "https://github.com/lorypelli/cpkgs"
+  },
+  "keywords": [
+    "go",
+    "c",
+    "package",
+    "packages",
+    "cli",
+    "cpkgs"
+  ],
+  "author": "LoryPelli",
+  "readme": "README.md",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
