@@ -15,7 +15,25 @@ import (
 )
 
 func Update() {
+	a := flag.Arg(1)
 	headers := flag.Args()[1:]
+	if a == "-a" {
+		headers = []string{}
+		var JSON pkg.JSON
+		dir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		j, _ := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
+		json.Unmarshal(j, &JSON)
+		for i := 0; i < len(JSON.Include.H); i++ {
+			header := strings.Split(JSON.Include.H[i], "/")
+			h := header[len(header)-1]
+			headers = append(headers, h)
+		}
+		fmt.Println(headers)
+	}
 	if len(headers) <= 0 {
 		scanner := bufio.NewScanner(os.Stdin)
 		fmt.Print("Provide headers file to update: ")
@@ -44,7 +62,10 @@ func Update() {
 			h := JSON.Include.H[i]
 			f := strings.Split(h, "/")
 			fname := f[len(f)-1]
-			if fname == headers[i] {
+			if fname == headers[i] || a == "-a" {
+				if a == "-a" {
+					fname = headers[i]
+				}
 				fmt.Printf("Updating header file %s...\n", fname)
 				res, err := http.Get(h)
 				if err != nil {
