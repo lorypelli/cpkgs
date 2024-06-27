@@ -40,6 +40,11 @@ func main() {
 			cmds.Run()
 			break
 		}
+	case "update":
+		{
+			cmds.Update()
+			break
+		}
 	default:
 		{
 			log.Fatal("Unknown command, to see all avaible commands type: 'cpkgs help' ")
