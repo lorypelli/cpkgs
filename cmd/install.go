@@ -1,24 +1,41 @@
 package cmd
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/lorypelli/cpkgs/pkg"
 )
 
 func Install() {
-	fmt.Println("Resolving packages...")
 	var JSON pkg.JSON
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	pkgs := flag.Args()[1:]
+	if len(pkgs) > 0 {
+		fmt.Println("You provided arguments to the command, 'cpkgs add' will be executed instead!")
+		cmd := fmt.Sprintf("cpkgs add %s", 	strings.Join(pkgs, " "))
+		cmdExec := exec.Command("sh", "-c", cmd)
+		if runtime.GOOS == "windows" {
+			cmdExec = exec.Command("cmd", "/C", cmd)
+		}
+		cmdExec.Stdin = os.Stdin
+		cmdExec.Stdout = os.Stdout
+		cmdExec.Stderr = os.Stderr
+		cmdExec.Run()
+		return
+	}
+	fmt.Println("Resolving packages...")
 	_, err = os.Stat("cpkgs")
 	if os.IsNotExist(err) {
 		err = os.Mkdir("cpkgs", 0777)
