@@ -35,6 +35,11 @@ func main() {
 			cmds.Install()
 			break
 		}
+	case "remove":
+		{
+			cmds.Remove()
+			break
+		}
 	case "run":
 		{
 			cmds.Run()
