@@ -30,9 +30,9 @@ func Install() {
 	if len(JSON.Include.H) <= 0 {
 		fmt.Println("No packages found!")
 	}
-	for i := 0; i < len(JSON.Include.H); i++ {
-		res, err := http.Get(JSON.Include.H[i])
-		pkg := strings.Split(JSON.Include.H[i], "/")
+	for _, h := range JSON.Include.H {
+		res, err := http.Get(h)
+		pkg := strings.Split(h, "/")
 		fmt.Printf("Installing package %s...\n", pkg[len(pkg)-1])
 		if err != nil {
 			log.Fatal(err)
@@ -44,13 +44,14 @@ func Install() {
 			log.Fatal(err)
 			return
 		}
-		filename := strings.Split(JSON.Include.H[i], "/")
+		filename := strings.Split(h, "/")
 		err = os.WriteFile(fmt.Sprintf("%s/cpkgs/%s", dir, filename[len(filename)-1]), body, 0777)
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
-		res, err = http.Get(JSON.Include.C[i])
+		c := strings.ReplaceAll(h, ".h", ".c")
+		res, err = http.Get(c)
 		if err != nil {
 			log.Fatal(err)
 			return
@@ -61,7 +62,7 @@ func Install() {
 			log.Fatal(err)
 			return
 		}
-		filename = strings.Split(JSON.Include.C[i], "/")
+		filename = strings.Split(c, "/")
 		err = os.WriteFile(fmt.Sprintf("%s/cpkgs/%s", dir, filename[len(filename)-1]), body, 0777)
 		if err != nil {
 			log.Fatal(err)

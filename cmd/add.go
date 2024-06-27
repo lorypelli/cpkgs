@@ -33,8 +33,8 @@ func Add() {
 		pkgs = strings.Split(p, " ")
 	}
 	scanner := bufio.NewScanner(os.Stdin)
-	for i := 0; i < len(pkgs); i++ {
-		u, _ := url.Parse(pkgs[i])
+	for _, pkg := range pkgs {
+		u, _ := url.Parse(pkg)
 		if len(u.Scheme) <= 0 || len(u.Host) <= 0 {
 			u.Scheme = "https"
 			u.Host = "github.com"
@@ -64,7 +64,7 @@ func Add() {
 		}
 		headers := strings.Split(h, " ")
 		c := 0
-		for i := 0; i < len(headers); i++ {
+		for i := range headers {
 			if !strings.HasSuffix(headers[i], "h") {
 				fmt.Printf("%s is not a valid header file\n", headers[i])
 				continue

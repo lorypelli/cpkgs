@@ -45,9 +45,9 @@ func Update() {
 		}
 		headers = strings.Split(h, " ")
 	}
-	for i := 0; i < len(headers); i++ {
-		if !strings.HasSuffix(headers[i], "h") {
-			fmt.Printf("%s is not a valid header file\n", headers[i])
+	for _, header := range headers {
+		if !strings.HasSuffix(header, "h") {
+			fmt.Printf("%s is not a valid header file\n", header)
 			continue
 		}
 		var JSON pkg.JSON
@@ -58,13 +58,12 @@ func Update() {
 		}
 		j, _ := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
 		json.Unmarshal(j, &JSON)
-		for i := 0; i < len(JSON.Include.H); i++ {
-			h := JSON.Include.H[i]
+		for _, h := range JSON.Include.H {
 			f := strings.Split(h, "/")
 			fname := f[len(f)-1]
-			if fname == headers[i] || a == "-a" {
+			if fname == header || a == "-a" {
 				if a == "-a" {
-					fname = headers[i]
+					fname = header
 				}
 				fmt.Printf("Updating header file %s...\n", fname)
 				res, err := http.Get(h)
@@ -83,7 +82,7 @@ func Update() {
 					log.Fatal(err)
 					return
 				}
-				c := JSON.Include.C[i]
+				c := strings.ReplaceAll(h, ".h", ".c")
 				c_files := strings.Split(c, "/")
 				c_fname := c_files[len(c_files)-1]
 				res, err = http.Get(c)
