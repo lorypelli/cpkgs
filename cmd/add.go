@@ -52,8 +52,8 @@ func Add() {
 			continue
 		}
 		found := false
-		for i := 0; i < len(JSON.Include.H) && !found; i++ {
-			url := strings.Split(JSON.Include.H[i], "/")
+		for _, h := range JSON.Include.H {
+			url := strings.Split(h, "/")
 			if h == url[len(url)-1] {
 				found = true
 			}

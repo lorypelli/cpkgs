@@ -56,9 +56,9 @@ func Run() {
 		log.Fatal(err)
 		return
 	}
-	for i := 0; i < len(files); i++ {
-		if strings.HasSuffix(files[i].Name(), ".c") {
-			cmd += fmt.Sprintf(" cpkgs/%s", files[i].Name())
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), ".c") {
+			cmd += fmt.Sprintf(" cpkgs/%s", f.Name())
 		}
 	}
 	cmd += fmt.Sprintf(" && cd cpkgs/bin && %s", JSON.FileName)
