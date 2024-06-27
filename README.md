@@ -26,9 +26,9 @@ You aren't satisfied by it, no problem, you can use the `cpkgs remove` command b
 
 By using the `cpkgs install` command, all of the packages will be fetched from the `cpkgs.json` file and will be installed automatically.
 
-<b>Note:</b> the `cpkgs` directory <b>SHOULD BE ALWAYS</b> placed in the `.gitignore` file.
+*Note*: the `cpkgs` directory **SHOULD BE ALWAYS** placed in the `.gitignore` file.
 
-I don't do this on the `example` directory on purpose only to showcase how the entire project will look but you <b>SHOULD ALWAYS</b> do this.
+I don't do this on the `example` directory on purpose only to showcase how the entire project will look but you **SHOULD ALWAYS** do this.
 
 ## Updating packages
 
