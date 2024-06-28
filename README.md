@@ -8,7 +8,7 @@ You have multiple commands avaible. To see them all type: `cpkgs help`
 
 ### Initializing a new project
 
-To do this you would need to use the `cpkgs init` command, you will be asked about which compiler to use and how the output filename should be called
+To do this you would need to use the `cpkgs init` command, you will be asked about which compiler to use and how the output filename should be called, you can use `-d` flag for default values
 
 ### Installing a package
 
