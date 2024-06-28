@@ -18,8 +18,6 @@ func Init() {
 		log.Fatal(err)
 		return
 	}
-	j, _ := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
-	json.Unmarshal(j, &JSON)
 	d := flag.Arg(1)
 	if d != "-d" && len(strings.TrimSpace(d)) > 0 {
 		dir = flag.Arg(1)
@@ -54,7 +52,7 @@ func Init() {
 		C: []string{},
 		H: []string{},
 	}
-	j, err = json.MarshalIndent(JSON, "", "  ")
+	j, err := json.MarshalIndent(JSON, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -64,7 +62,7 @@ func Init() {
 		log.Fatal(err)
 		return
 	}
-	fmt.Println("Successfully created file cpkgs.json with the following settings:")
+	fmt.Println("Successfully created cpkgs.json file with the following settings:")
 	fmt.Print("\n")
 	fmt.Printf("Compiler -> %s\n", compiler)
 	fmt.Printf("Filename -> %s\n", filename)

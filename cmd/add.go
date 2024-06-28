@@ -17,12 +17,11 @@ import (
 
 func Add() {
 	var JSON pkg.JSON
-	dir, err := os.Getwd()
+	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	j, _ := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
 	json.Unmarshal(j, &JSON)
 	pkgs := flag.Args()[1:]
 	if len(pkgs) <= 0 {
@@ -43,7 +42,7 @@ func Add() {
 			log.Fatal("Currently only github is supported!")
 			return
 		}
-		fmt.Printf("Provide headers file to add from '%s': ", strings.TrimPrefix(strings.ReplaceAll(u.Path, u.Host, ""), "/"))
+		fmt.Printf("Provide headers file to add from '%s': ", strings.TrimSuffix(strings.TrimPrefix(strings.ReplaceAll(u.Path, u.Host, ""), "/"), "/"))
 		u.Host = "raw.githubusercontent.com"
 		urlString := strings.ReplaceAll(u.String(), "/github.com", "")
 		scanner.Scan()
@@ -51,26 +50,25 @@ func Add() {
 		if len(strings.TrimSpace(h)) <= 0 {
 			continue
 		}
-		found := false
-		for _, header := range JSON.Include.H {
-			url := strings.Split(header, "/")
-			if h == url[len(url)-1] {
-				found = true
-				break
-			}
-		}
-		if found {
-			fmt.Println("Header file already exists, skipping...")
-			continue
-		}
 		headers := strings.Split(h, " ")
-		c := 0
-		for i := range headers {
-			if !strings.HasSuffix(headers[i], "h") {
-				fmt.Printf("%s is not a valid header file\n", headers[i])
+		for _, header := range headers {
+			found := false
+			for _, h := range JSON.Include.H {
+				url := strings.Split(h, "/")
+				if header == url[len(url)-1] {
+					found = true
+					break
+				}
+			}
+			if found {
+				fmt.Println("Header file already exists, skipping...")
 				continue
 			}
-			res, err := http.Get(fmt.Sprintf("%s/master/%s", urlString, headers[i+c]))
+			if !strings.HasSuffix(header, ".h") {
+				fmt.Printf("%s is not a valid header file, skipping...\n", header)
+				continue
+			}
+			res, err := http.Get(fmt.Sprintf("%s/master/%s", urlString, header))
 			for res.StatusCode != 200 || err != nil {
 				var choice string
 				fmt.Print("Before skipping this header file, do you want to try searching it in the include directory? (Y/n) ")
@@ -79,18 +77,15 @@ func Add() {
 					choice = "y"
 				}
 				if strings.ToLower(choice) == "y" {
-					res, err = http.Get(fmt.Sprintf("%s/master/include/%s", urlString, headers[i+c]))
+					res, err = http.Get(fmt.Sprintf("%s/master/include/%s", urlString, header))
 					if res.StatusCode != 200 || err != nil {
-						fmt.Printf("Unable to get %s header file, skipping...\n", headers[i+c])
+						fmt.Printf("Unable to get %s header file, skipping...\n", header)
+						continue
 					}
 				} else {
-					fmt.Printf("Unable to get %s header file, skipping...\n", headers[i+c])
+					fmt.Printf("Unable to get %s header file, skipping...\n", header)
+					continue
 				}
-				c++
-				if i+c >= len(headers) {
-					break
-				}
-				res, err = http.Get(fmt.Sprintf("%s/master/%s", urlString, headers[i+c]))
 			}
 			defer res.Body.Close()
 			body, err := io.ReadAll(res.Body)
@@ -106,19 +101,19 @@ func Add() {
 					return
 				}
 			}
-			err = os.WriteFile(fmt.Sprintf("cpkgs/%s", headers[i]), body, 0777)
+			err = os.WriteFile(fmt.Sprintf("cpkgs/%s", header), body, 0777)
 			if err != nil {
 				log.Fatal(err)
 				return
 			}
 			JSON.Include.H = append(JSON.Include.H, res.Request.URL.String())
-			code := strings.ReplaceAll(headers[i], ".h", ".c")
-			res, err = http.Get(fmt.Sprintf("%s/master/%s", urlString, strings.ReplaceAll(headers[i], ".h", ".c")))
+			code := strings.ReplaceAll(header, ".h", ".c")
+			res, err = http.Get(fmt.Sprintf("%s/master/%s", urlString, code))
 			for res.StatusCode != 200 || err != nil {
 				var dir string
 				fmt.Print("C code file not found, please provide directory: ")
 				fmt.Scan(&dir)
-				res, err = http.Get(fmt.Sprintf("%s/master/%s/%s", u.String(), dir, headers[i]))
+				res, err = http.Get(fmt.Sprintf("%s/master/%s/%s", u.String(), dir, header))
 			}
 			defer res.Body.Close()
 			body, err = io.ReadAll(res.Body)
@@ -142,7 +137,7 @@ func Add() {
 				log.Fatal(err)
 				return
 			}
-			fmt.Printf("Successfully added header file %s!\n", headers[i])
+			fmt.Printf("Successfully added header file %s!\n", header)
 		}
 	}
 }

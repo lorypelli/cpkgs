@@ -16,14 +16,16 @@ import (
 
 func Run() {
 	var JSON pkg.JSON
-	dir, err := os.Getwd()
+	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	j, _ := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
 	json.Unmarshal(j, &JSON)
-	f := filepath.Clean(flag.Arg(1))
+	f := flag.Arg(1)
+	if len(strings.TrimSpace(f)) <= 0 {
+		f = "main.c"
+	}
 	file, err := filepath.Abs(f)
 	if err != nil {
 		log.Fatal(err)
@@ -50,7 +52,7 @@ func Run() {
 			return
 		}
 	}
-	cmd := fmt.Sprintf("cd %s && %s -o cpkgs/bin/%s %s", path, JSON.Compiler, fname, strings.Join(flag.Args()[1:], " "))
+	cmd := fmt.Sprintf("cd %s && %s -o cpkgs/bin/%s %s %s", path, JSON.Compiler, fname, file, strings.Join(flag.Args()[1:], " "))
 	files, err := os.ReadDir(fmt.Sprintf("%s/cpkgs", path))
 	if err != nil {
 		log.Fatal(err)

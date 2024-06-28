@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -16,15 +17,17 @@ import (
 
 func Install() {
 	var JSON pkg.JSON
-	dir, err := os.Getwd()
+	j, err := os.ReadFile("cpkgs.json")
+	json.Unmarshal(j, &JSON)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	json.Unmarshal(j, &JSON)
 	pkgs := flag.Args()[1:]
 	if len(pkgs) > 0 {
 		fmt.Println("You provided arguments to the command, 'cpkgs add' will be executed instead!")
-		cmd := fmt.Sprintf("cpkgs add %s", 	strings.Join(pkgs, " "))
+		cmd := fmt.Sprintf("cpkgs add %s", strings.Join(pkgs, " "))
 		cmdExec := exec.Command("sh", "-c", cmd)
 		if runtime.GOOS == "windows" {
 			cmdExec = exec.Command("cmd", "/C", cmd)
@@ -62,7 +65,7 @@ func Install() {
 			return
 		}
 		filename := strings.Split(h, "/")
-		err = os.WriteFile(fmt.Sprintf("%s/cpkgs/%s", dir, filename[len(filename)-1]), body, 0777)
+		err = os.WriteFile(fmt.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777)
 		if err != nil {
 			log.Fatal(err)
 			return
@@ -80,7 +83,7 @@ func Install() {
 			return
 		}
 		filename = strings.Split(c, "/")
-		err = os.WriteFile(fmt.Sprintf("%s/cpkgs/%s", dir, filename[len(filename)-1]), body, 0777)
+		err = os.WriteFile(fmt.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777)
 		if err != nil {
 			log.Fatal(err)
 			return

@@ -20,19 +20,17 @@ func Update() {
 	if a == "-a" {
 		headers = []string{}
 		var JSON pkg.JSON
-		dir, err := os.Getwd()
+		j, err := os.ReadFile("cpkgs.json")
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
-		j, _ := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
 		json.Unmarshal(j, &JSON)
-		for i := 0; i < len(JSON.Include.H); i++ {
-			header := strings.Split(JSON.Include.H[i], "/")
+		for _, h := range JSON.Include.H {
+			header := strings.Split(h, "/")
 			h := header[len(header)-1]
 			headers = append(headers, h)
 		}
-		fmt.Println(headers)
 	}
 	if len(headers) <= 0 {
 		scanner := bufio.NewScanner(os.Stdin)
@@ -46,17 +44,16 @@ func Update() {
 		headers = strings.Split(h, " ")
 	}
 	for _, header := range headers {
-		if !strings.HasSuffix(header, "h") {
+		if !strings.HasSuffix(header, ".h") {
 			fmt.Printf("%s is not a valid header file\n", header)
 			continue
 		}
 		var JSON pkg.JSON
-		dir, err := os.Getwd()
+		j, err := os.ReadFile("cpkgs.json")
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
-		j, _ := os.ReadFile(fmt.Sprintf("%s/cpkgs.json", dir))
 		json.Unmarshal(j, &JSON)
 		for _, h := range JSON.Include.H {
 			f := strings.Split(h, "/")

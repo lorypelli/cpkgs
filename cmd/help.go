@@ -12,6 +12,7 @@ func Help() {
 	fmt.Println("|'cpkgs install' - install all of the packages in the current project     |")
 	fmt.Println("|'cpkgs remove' - removes project directory                               |")
 	fmt.Println("|'cpkgs run <file-name>' - run the file name using your selected compiler |")
+	fmt.Println("|'cpkgs uninstall <package-name>' - removes the provided C package        |")
 	fmt.Println("|'cpkgs update <package-name>' - updates the provided C package           |")
 	fmt.Println("---------------------------------------------------------------------------")
 }

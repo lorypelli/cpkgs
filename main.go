@@ -45,6 +45,11 @@ func main() {
 			cmds.Run()
 			break
 		}
+	case "uninstall":
+		{
+			cmds.Uninstall()
+			break
+		}
 	case "update":
 		{
 			cmds.Update()
