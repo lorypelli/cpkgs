@@ -19,7 +19,7 @@ func Init() {
 		return
 	}
 	d := flag.Arg(1)
-	if d != "-d" && len(strings.TrimSpace(d)) > 0 {
+	if d != "-d" && d != "--default" && len(strings.TrimSpace(d)) > 0 {
 		dir = flag.Arg(1)
 		d = flag.Arg(2)
 	}
@@ -28,7 +28,7 @@ func Init() {
 		os.Mkdir(dir, 0777)
 	}
 	var compiler, filename string
-	if d != "-d" {
+	if d != "-d" && d != "--default" {
 		fmt.Print("Provide the compiler to use: ")
 		fmt.Scanln(&compiler)
 		if len(strings.TrimSpace(compiler)) <= 0 {

@@ -17,7 +17,7 @@ import (
 func Update() {
 	a := flag.Arg(1)
 	headers := flag.Args()[1:]
-	if a == "-a" {
+	if a == "-a" || a == "--all" {
 		headers = []string{}
 		var JSON pkg.JSON
 		j, err := os.ReadFile("cpkgs.json")
@@ -58,8 +58,8 @@ func Update() {
 		for _, h := range JSON.Include.H {
 			f := strings.Split(h, "/")
 			fname := f[len(f)-1]
-			if fname == header || a == "-a" {
-				if a == "-a" {
+			if fname == header || a == "-a" || a == "--all" {
+				if a == "-a" || a == "--all" {
 					fname = header
 				}
 				fmt.Printf("Updating header file %s...\n", fname)
