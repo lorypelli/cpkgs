@@ -23,10 +23,6 @@ func Init() {
 		dir = flag.Arg(1)
 		d = flag.Arg(2)
 	}
-	_, e := os.Stat(dir)
-	if os.IsNotExist(e) {
-		os.Mkdir(dir, 0777)
-	}
 	var compiler, filename string
 	if d != "-d" && d != "--default" {
 		fmt.Print("Provide the compiler to use: ")
@@ -46,6 +42,12 @@ func Init() {
 		compiler = "gcc"
 		filename = "out"
 	}
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if err := os.Mkdir(dir, 0777); err != nil {
+			log.Fatal(err)
+			return
+		}
+	}
 	JSON.Compiler = compiler
 	JSON.FileName = filename
 	JSON.Include = pkg.Include{
@@ -57,8 +59,7 @@ func Init() {
 		log.Fatal(err)
 		return
 	}
-	err = os.WriteFile(fmt.Sprintf("%s/cpkgs.json", dir), j, 0777)
-	if err != nil {
+	if err := os.WriteFile(fmt.Sprintf("%s/cpkgs.json", dir), j, 0777); err != nil {
 		log.Fatal(err)
 		return
 	}

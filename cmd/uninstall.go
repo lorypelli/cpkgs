@@ -34,13 +34,11 @@ func Uninstall() {
 			continue
 		}
 		fmt.Printf("Removing package %s...\n", pkg)
-		err := os.Remove(fmt.Sprintf("cpkgs/%s", pkg))
-		if err != nil {
+		if err := os.Remove(fmt.Sprintf("cpkgs/%s", pkg)); err != nil {
 			log.Fatal(err)
 			return
 		}
-		err = os.Remove(fmt.Sprintf("cpkgs/%s", strings.ReplaceAll(pkg, ".h", ".c")))
-		if err != nil {
+		if err := os.Remove(fmt.Sprintf("cpkgs/%s", strings.ReplaceAll(pkg, ".h", ".c"))); err != nil {
 			log.Fatal(err)
 			return
 		}
@@ -57,8 +55,7 @@ func Uninstall() {
 			log.Fatal(err)
 			return
 		}
-		err = os.WriteFile("cpkgs.json", j, 0777)
-		if err != nil {
+		if err = os.WriteFile("cpkgs.json", j, 0777); err != nil {
 			log.Fatal(err)
 			return
 		}

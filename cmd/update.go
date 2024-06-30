@@ -55,6 +55,10 @@ func Update() {
 			return
 		}
 		json.Unmarshal(j, &JSON)
+		if len(JSON.Include.H) <= 0 {
+			fmt.Println("No packages found!")
+			return
+		}
 		for _, h := range JSON.Include.H {
 			f := strings.Split(h, "/")
 			fname := f[len(f)-1]
@@ -74,8 +78,7 @@ func Update() {
 					log.Fatal(err)
 					return
 				}
-				err = os.WriteFile(fmt.Sprintf("cpkgs/%s", fname), body, 0777)
-				if err != nil {
+				if err := os.WriteFile(fmt.Sprintf("cpkgs/%s", fname), body, 0777); err != nil {
 					log.Fatal(err)
 					return
 				}
@@ -93,8 +96,7 @@ func Update() {
 					log.Fatal(err)
 					return
 				}
-				err = os.WriteFile(fmt.Sprintf("cpkgs/%s", c_fname), body, 0777)
-				if err != nil {
+				if err := os.WriteFile(fmt.Sprintf("cpkgs/%s", c_fname), body, 0777); err != nil {
 					log.Fatal(err)
 					return
 				}

@@ -93,16 +93,13 @@ func Add() {
 				log.Fatal(err)
 				return
 			}
-			_, err = os.Stat("cpkgs")
-			if os.IsNotExist(err) {
-				err = os.Mkdir("cpkgs", 0777)
-				if err != nil {
+			if _, err := os.Stat("cpkgs"); os.IsNotExist(err) {
+				if err := os.Mkdir("cpkgs", 0777); err != nil {
 					log.Fatal(err)
 					return
 				}
 			}
-			err = os.WriteFile(fmt.Sprintf("cpkgs/%s", header), body, 0777)
-			if err != nil {
+			if err := os.WriteFile(fmt.Sprintf("cpkgs/%s", header), body, 0777); err != nil {
 				log.Fatal(err)
 				return
 			}
@@ -121,8 +118,7 @@ func Add() {
 				log.Fatal(err)
 				return
 			}
-			err = os.WriteFile(fmt.Sprintf("cpkgs/%s", code), body, 0777)
-			if err != nil {
+			if err := os.WriteFile(fmt.Sprintf("cpkgs/%s", code), body, 0777); err != nil {
 				log.Fatal(err)
 				return
 			}
@@ -132,8 +128,7 @@ func Add() {
 				log.Fatal(err)
 				return
 			}
-			err = os.WriteFile("cpkgs.json", j, 0777)
-			if err != nil {
+			if err = os.WriteFile("cpkgs.json", j, 0777); err != nil {
 				log.Fatal(err)
 				return
 			}

@@ -18,15 +18,13 @@ import (
 func Install() {
 	var JSON pkg.JSON
 	j, err := os.ReadFile("cpkgs.json")
-	json.Unmarshal(j, &JSON)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	json.Unmarshal(j, &JSON)
 	if len(flag.Args()) > 0 {
-		pkgs := flag.Args()[1:]
-		if len(pkgs) > 0 {
+		if pkgs := flag.Args()[1:]; len(pkgs) > 0 {
 			fmt.Println("You provided arguments to the command, 'cpkgs add' will be executed instead!")
 			cmd := fmt.Sprintf("cpkgs add %s", strings.Join(pkgs, " "))
 			cmdExec := exec.Command("sh", "-c", cmd)
@@ -41,10 +39,8 @@ func Install() {
 		}
 	}
 	fmt.Println("Resolving packages...")
-	_, err = os.Stat("cpkgs")
-	if os.IsNotExist(err) {
-		err = os.Mkdir("cpkgs", 0777)
-		if err != nil {
+	if _, err := os.Stat("cpkgs"); os.IsNotExist(err) {
+		if err := os.Mkdir("cpkgs", 0777); err != nil {
 			log.Fatal(err)
 			return
 		}
@@ -67,8 +63,7 @@ func Install() {
 			return
 		}
 		filename := strings.Split(h, "/")
-		err = os.WriteFile(fmt.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777)
-		if err != nil {
+		if err := os.WriteFile(fmt.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777); err != nil {
 			log.Fatal(err)
 			return
 		}
@@ -85,8 +80,7 @@ func Install() {
 			return
 		}
 		filename = strings.Split(c, "/")
-		err = os.WriteFile(fmt.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777)
-		if err != nil {
+		if err := os.WriteFile(fmt.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777); err != nil {
 			log.Fatal(err)
 			return
 		}

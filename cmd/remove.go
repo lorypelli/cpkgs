@@ -17,8 +17,7 @@ func Remove() {
 		fmt.Scan(&dir)
 	}
 	if strings.HasSuffix(dir, ".h") {
-		pkgs := flag.Args()[1:]
-		if len(pkgs) > 0 {
+		if pkgs := flag.Args()[1:]; len(pkgs) > 0 {
 			fmt.Println("You provided header files to the command, 'cpkgs uninstall' will be executed instead!")
 			cmd := fmt.Sprintf("cpkgs uninstall %s", strings.Join(pkgs, " "))
 			cmdExec := exec.Command("sh", "-c", cmd)
@@ -37,8 +36,7 @@ func Remove() {
 		log.Fatal(err)
 		return
 	}
-	_, err = os.Stat(fmt.Sprintf("%s/cpkgs.json", dir))
-	if err != nil {
+	if _, err := os.Stat(fmt.Sprintf("%s/cpkgs.json", dir)); err != nil {
 		log.Fatal(err)
 		return
 	}
@@ -47,8 +45,7 @@ func Remove() {
 	fmt.Scan(&choice)
 	if strings.ToLower(choice) == "y" {
 		fmt.Printf("Removing directory %s...\n", d.Name())
-		err = os.RemoveAll(dir)
-		if err != nil {
+		if err := os.RemoveAll(dir); err != nil {
 			log.Fatal(err)
 			return
 		}

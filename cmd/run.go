@@ -23,8 +23,10 @@ func Run() {
 	}
 	json.Unmarshal(j, &JSON)
 	f := flag.Arg(1)
+	c := 2
 	if len(strings.TrimSpace(f)) <= 0 {
 		f = "main.c"
+		c = 1
 	}
 	file, err := filepath.Abs(f)
 	if err != nil {
@@ -36,23 +38,19 @@ func Run() {
 		JSON.FileName += ".exe"
 	}
 	fname := JSON.FileName
-	_, err = os.Stat("cpkgs")
-	if os.IsNotExist(err) {
-		err = os.Mkdir("cpkgs", 0777)
-		if err != nil {
+	if _, err := os.Stat("cpkgs"); os.IsNotExist(err) {
+		if err := os.Mkdir("cpkgs", 0777); err != nil {
 			log.Fatal(err)
 			return
 		}
 	}
-	_, err = os.Stat("cpkgs/bin")
-	if os.IsNotExist(err) {
-		err = os.Mkdir("cpkgs/bin", 0777)
-		if err != nil {
+	if _, err := os.Stat("cpkgs/bin"); os.IsNotExist(err) {
+		if err := os.Mkdir("cpkgs/bin", 0777); err != nil {
 			log.Fatal(err)
 			return
 		}
 	}
-	cmd := fmt.Sprintf("cd %s && %s -o cpkgs/bin/%s %s %s", path, JSON.Compiler, fname, file, strings.Join(flag.Args()[1:], " "))
+	cmd := fmt.Sprintf("cd %s && %s -o cpkgs/bin/%s %s %s", path, JSON.Compiler, fname, f, strings.Join(flag.Args()[c:], " "))
 	files, err := os.ReadDir(fmt.Sprintf("%s/cpkgs", path))
 	if err != nil {
 		log.Fatal(err)
