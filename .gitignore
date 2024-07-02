@@ -1,3 +1,4 @@
 *.exe
 *.exe~
 node_modules
+test

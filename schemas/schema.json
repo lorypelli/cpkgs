@@ -1,0 +1,107 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "language": {
+            "type": "string",
+            "enum": [
+                "C",
+                "C++"
+            ]
+        },
+        "compiler": {
+            "type": "string"
+        },
+        "file_name": {
+            "type": "string"
+        },
+        "include": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "C": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "C++": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "H": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "H++": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "cpp_extensions": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "enum": [
+                        ".cpp",
+                        ".cc",
+                        ".cxx",
+                        ".c++",
+                        ".cp"
+                    ]
+                },
+                "header": {
+                    "type": "string",
+                    "enum": [
+                        ".h",
+                        ".hpp",
+                        ".hh",
+                        ".hxx",
+                        ".h++",
+                        ".hp"
+                    ]
+                }
+            },
+            "required": [
+                "code",
+                "header"
+            ]
+        }
+    },
+    "required": [
+        "language",
+        "file_name",
+        "include"
+    ],
+    "if": {
+        "properties": {
+            "language": {
+                "const": "C++"
+            }
+        }
+    },
+    "then": {
+        "required": [
+            "additional_cpp_options"
+        ]
+    },
+    "else": {
+        "not": {
+            "required": [
+                "additional_cpp_options"
+            ]
+        }
+    }
+}
