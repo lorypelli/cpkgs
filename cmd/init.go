@@ -81,4 +81,7 @@ func Init() {
 	pterm.Info.Printfln("Language -> %s", language)
 	pterm.Info.Printfln("Compiler -> %s", compiler)
 	pterm.Info.Printfln("Filename -> %s", filename)
+	if err := os.RemoveAll("cpkgs"); err != nil {
+		pterm.Error.Println(err)
+	}
 }

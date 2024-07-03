@@ -84,12 +84,15 @@ func Add() {
 					res, err = http.Get(pterm.Sprintf("%s/master/include/%s", urlString, header))
 					if res.StatusCode != 200 || err != nil {
 						pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
-						continue
+						break
 					}
 				} else {
 					pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
-					continue
+					break
 				}
+			}
+			if res.StatusCode != 200 {
+				continue
 			}
 			defer res.Body.Close()
 			body, err := io.ReadAll(res.Body)
@@ -109,10 +112,14 @@ func Add() {
 			}
 			if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
 				JSON.Include.HPP = append(JSON.Include.HPP, res.Request.URL.String())
+			} else {
+				JSON.Include.H = append(JSON.Include.H, res.Request.URL.String())
 			}
 			var code string
 			if JSON.Language == "C++" {
 				code = strings.ReplaceAll(header, JSON.CPPExtensions.Header, JSON.CPPExtensions.Code)
+			} else {
+				code = strings.ReplaceAll(header, ".h", ".c")
 			}
 			res, err = http.Get(pterm.Sprintf("%s/master/%s", urlString, code))
 			for res.StatusCode != 200 || err != nil {
