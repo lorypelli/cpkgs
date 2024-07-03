@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/lorypelli/cpkgs/pkg"
+	"github.com/lorypelli/cpkgs/utils"
 	"github.com/pterm/pterm"
 )
 
@@ -51,8 +52,8 @@ func Install() {
 	p, _ := pterm.DefaultProgressbar.WithTotal(len(JSON.Include.H)).WithTitle("Resolving packages...").Start()
 	for _, h := range JSON.Include.H {
 		res, err := http.Get(h)
-		pkg := strings.Split(h, "/")
-		p.UpdateTitle(pterm.Sprintf("Installing package %s...", pkg[len(pkg)-1]))
+		pkg := utils.At(strings.Split(h, "/"), -1)
+		p.UpdateTitle(pterm.Sprintf("Installing package %s...", pkg))
 		if err != nil {
 			pterm.Error.Println(err)
 			return
@@ -63,8 +64,7 @@ func Install() {
 			pterm.Error.Println(err)
 			return
 		}
-		filename := strings.Split(h, "/")
-		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777); err != nil {
+		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", pkg), body, 0777); err != nil {
 			pterm.Error.Println(err)
 			return
 		}
@@ -80,8 +80,7 @@ func Install() {
 			pterm.Error.Println(err)
 			return
 		}
-		filename = strings.Split(c, "/")
-		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777); err != nil {
+		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(c, "/"), -1)), body, 0777); err != nil {
 			pterm.Error.Println(err)
 			return
 		}

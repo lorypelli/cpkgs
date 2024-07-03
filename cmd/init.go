@@ -64,7 +64,7 @@ func Init() {
 		code, _ = pterm.DefaultInteractiveSelect.WithDefaultText("Provide code files extension").WithDefaultOption(".cpp").WithOptions([]string{".cpp", ".cc", ".cxx", ".c++", ".cp"}).Show()
 		header, _ = pterm.DefaultInteractiveSelect.WithDefaultText("Provide header files extension").WithDefaultOption(".h").WithOptions([]string{".h", ".hpp", ".hh", ".hxx", ".h++", ".hp"}).Show()
 		JSON.CPPExtensions = &pkg.CPPExtensions{
-			Code: code,
+			Code:   code,
 			Header: header,
 		}
 	}

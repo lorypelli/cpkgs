@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/lorypelli/cpkgs/pkg"
+	"github.com/lorypelli/cpkgs/utils"
 	"github.com/pterm/pterm"
 )
 
@@ -45,21 +46,14 @@ func Add() {
 		headers := strings.Split(h, " ")
 		for _, header := range headers {
 			found := false
+			include := JSON.Include.H
 			if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
-				for _, h := range JSON.Include.HPP {
-					url := strings.Split(h, "/")
-					if header == url[len(url)-1] {
-						found = true
-						break
-					}
-				}
-			} else {
-				for _, h := range JSON.Include.H {
-					url := strings.Split(h, "/")
-					if header == url[len(url)-1] {
-						found = true
-						break
-					}
+				include = JSON.Include.HPP
+			}
+			for _, h := range include {
+				if header == utils.At(strings.Split(h, "/"), -1) {
+					found = true
+					break
 				}
 			}
 			if found {
@@ -77,22 +71,19 @@ func Add() {
 					continue
 				}
 			}
-			res, err := http.Get(pterm.Sprintf("%s/master/%s", urlString, header))
-			for res.StatusCode != 200 || err != nil {
+			res, err := http.Get(pterm.Sprintf("%s/master/%s", urlString, utils.At(strings.Split(header, "/"), -1)))
+			if res.StatusCode != 200 || err != nil {
 				choice, _ := pterm.DefaultInteractiveConfirm.WithDefaultText("Before skipping this header file, do you want to try searching it in the include directory?").Show()
 				if choice {
-					res, err = http.Get(pterm.Sprintf("%s/master/include/%s", urlString, header))
+					res, err = http.Get(pterm.Sprintf("%s/master/include/%s", urlString, utils.At(strings.Split(header, "/"), -1)))
 					if res.StatusCode != 200 || err != nil {
 						pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
-						break
+						continue
 					}
 				} else {
 					pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
-					break
+					continue
 				}
-			}
-			if res.StatusCode != 200 {
-				continue
 			}
 			defer res.Body.Close()
 			body, err := io.ReadAll(res.Body)
