@@ -1,4 +1,4 @@
-module github.com/lorypelli/cpkgs
+module github.com/lorypelli/cpkgs/v2
 
 go 1.22.5
 

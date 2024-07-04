@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/lorypelli/cpkgs/pkg"
+	"github.com/lorypelli/cpkgs/v2/pkg"
 	"github.com/pterm/pterm"
 )
 

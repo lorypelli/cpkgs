@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	cmds "github.com/lorypelli/cpkgs/cmd"
+	cmds "github.com/lorypelli/cpkgs/v2/cmd"
 )
 
 func main() {

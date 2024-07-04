@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lorypelli/cpkgs/pkg"
-	"github.com/lorypelli/cpkgs/utils"
+	"github.com/lorypelli/cpkgs/v2/pkg"
+	"github.com/lorypelli/cpkgs/v2/utils"
 	"github.com/pterm/pterm"
 )
 
