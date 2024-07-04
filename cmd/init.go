@@ -3,19 +3,18 @@ package cmd
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/lorypelli/cpkgs/pkg"
+	"github.com/pterm/pterm"
 )
 
 func Init() {
 	var JSON pkg.JSON
 	dir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		pterm.Error.Println(err)
 		return
 	}
 	d := flag.Arg(1)
@@ -23,48 +22,66 @@ func Init() {
 		dir = flag.Arg(1)
 		d = flag.Arg(2)
 	}
-	var compiler, filename string
+	var language, compiler, filename string
 	if d != "-d" && d != "--default" {
-		fmt.Print("Provide the compiler to use: ")
-		fmt.Scanln(&compiler)
+		language, _ = pterm.DefaultInteractiveSelect.WithDefaultText("Provide language").WithDefaultOption("C").WithOptions([]string{"C", "C++"}).Show()
+		compiler, _ = pterm.DefaultInteractiveTextInput.WithDefaultText("Provide the compiler to use").WithDefaultValue("gcc").Show()
 		if len(strings.TrimSpace(compiler)) <= 0 {
-			fmt.Println("Using default...(gcc)")
+			pterm.Info.Println("Using default...(gcc)")
 			compiler = "gcc"
 		}
-		fmt.Print("Provide the output filename: ")
-		fmt.Scanln(&filename)
+		filename, _ = pterm.DefaultInteractiveTextInput.WithDefaultText("Provide the output filename").WithDefaultValue("out").Show()
 		if len(strings.TrimSpace(filename)) <= 0 {
-			fmt.Println("Using default...(out)")
+			pterm.Info.Println("Using default...(out)")
 			filename = "out"
 		}
 	} else {
-		fmt.Println("Using defaults...(gcc, out)")
+		pterm.Info.Println("Using defaults...(C, gcc, out)")
+		language = "C"
 		compiler = "gcc"
 		filename = "out"
 	}
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		if err := os.Mkdir(dir, 0777); err != nil {
-			log.Fatal(err)
+			pterm.Error.Println(err)
 			return
 		}
 	}
+	JSON.Schema = "https://raw.githubusercontent.com/lorypelli/cpkgs/main/schemas/schema.json"
+	JSON.Language = language
 	JSON.Compiler = compiler
 	JSON.FileName = filename
 	JSON.Include = pkg.Include{
-		C: []string{},
-		H: []string{},
+		C:   []string{},
+		CPP: []string{},
+		H:   []string{},
+		HPP: []string{},
+	}
+	JSON.CPPExtensions = nil
+	if language == "C++" {
+		var code, header string
+		pterm.Warning.Println("You selected C++ so you will need to provide additional options")
+		code, _ = pterm.DefaultInteractiveSelect.WithDefaultText("Provide code files extension").WithDefaultOption(".cpp").WithOptions([]string{".cpp", ".cc", ".cxx", ".c++", ".cp"}).Show()
+		header, _ = pterm.DefaultInteractiveSelect.WithDefaultText("Provide header files extension").WithDefaultOption(".h").WithOptions([]string{".h", ".hpp", ".hh", ".hxx", ".h++", ".hp"}).Show()
+		JSON.CPPExtensions = &pkg.CPPExtensions{
+			Code:   code,
+			Header: header,
+		}
 	}
 	j, err := json.MarshalIndent(JSON, "", "  ")
 	if err != nil {
-		log.Fatal(err)
+		pterm.Error.Println(err)
 		return
 	}
-	if err := os.WriteFile(fmt.Sprintf("%s/cpkgs.json", dir), j, 0777); err != nil {
-		log.Fatal(err)
+	if err := os.WriteFile(pterm.Sprintf("%s/cpkgs.json", dir), j, 0777); err != nil {
+		pterm.Error.Println(err)
 		return
 	}
-	fmt.Println("Successfully created cpkgs.json file with the following settings:")
-	fmt.Print("\n")
-	fmt.Printf("Compiler -> %s\n", compiler)
-	fmt.Printf("Filename -> %s\n", filename)
+	pterm.Success.Println("Successfully created cpkgs.json file with the following settings:")
+	pterm.Info.Printfln("Language -> %s", language)
+	pterm.Info.Printfln("Compiler -> %s", compiler)
+	pterm.Info.Printfln("Filename -> %s", filename)
+	if err := os.RemoveAll("cpkgs"); err != nil {
+		pterm.Error.Println(err)
+	}
 }

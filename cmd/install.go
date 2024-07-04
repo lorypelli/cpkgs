@@ -3,9 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -13,20 +11,22 @@ import (
 	"strings"
 
 	"github.com/lorypelli/cpkgs/pkg"
+	"github.com/lorypelli/cpkgs/utils"
+	"github.com/pterm/pterm"
 )
 
 func Install() {
 	var JSON pkg.JSON
 	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
-		log.Fatal(err)
+		pterm.Error.Println(err)
 		return
 	}
 	json.Unmarshal(j, &JSON)
 	if len(flag.Args()) > 0 {
 		if pkgs := flag.Args()[1:]; len(pkgs) > 0 {
-			fmt.Println("You provided arguments to the command, 'cpkgs add' will be executed instead!")
-			cmd := fmt.Sprintf("cpkgs add %s", strings.Join(pkgs, " "))
+			pterm.Warning.Println("You provided arguments to the command, 'cpkgs add' will be executed instead!")
+			cmd := pterm.Sprintf("cpkgs add %s", strings.Join(pkgs, " "))
 			cmdExec := exec.Command("sh", "-c", cmd)
 			if runtime.GOOS == "windows" {
 				cmdExec = exec.Command("cmd", "/C", cmd)
@@ -38,51 +38,62 @@ func Install() {
 			return
 		}
 	}
-	fmt.Println("Resolving packages...")
+	pterm.Info.Println("Resolving packages...")
 	if _, err := os.Stat("cpkgs"); os.IsNotExist(err) {
 		if err := os.Mkdir("cpkgs", 0777); err != nil {
-			log.Fatal(err)
+			pterm.Error.Println(err)
 			return
 		}
 	}
-	if len(JSON.Include.H) <= 0 {
-		fmt.Println("No packages found!")
+	include := JSON.Include.H
+	if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
+		include = JSON.Include.HPP
 	}
-	for _, h := range JSON.Include.H {
+	if len(include) <= 0 {
+		pterm.Error.Println("No packages found!")
+		return
+	}
+	p, _ := pterm.DefaultProgressbar.WithTotal(len(JSON.Include.H)).WithTitle("Resolving packages...").Start()
+	for _, h := range include {
 		res, err := http.Get(h)
-		pkg := strings.Split(h, "/")
-		fmt.Printf("Installing package %s...\n", pkg[len(pkg)-1])
+		pkg := utils.At(strings.Split(h, "/"), -1)
+		p.UpdateTitle(pterm.Sprintf("Installing package %s...", pkg))
 		if err != nil {
-			log.Fatal(err)
+			pterm.Error.Println(err)
 			return
 		}
 		defer res.Body.Close()
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
-			log.Fatal(err)
+			pterm.Error.Println(err)
 			return
 		}
-		filename := strings.Split(h, "/")
-		if err := os.WriteFile(fmt.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777); err != nil {
-			log.Fatal(err)
+		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", pkg), body, 0777); err != nil {
+			pterm.Error.Println(err)
 			return
 		}
-		c := strings.ReplaceAll(h, ".h", ".c")
-		res, err = http.Get(c)
+		var code string
+		if JSON.Language == "C++" {
+			code = strings.ReplaceAll(h, JSON.CPPExtensions.Header, JSON.CPPExtensions.Code)
+		} else {
+			code = strings.ReplaceAll(h, ".h", ".c")
+		}
+		res, err = http.Get(code)
 		if err != nil {
-			log.Fatal(err)
+			pterm.Error.Println(err)
 			return
 		}
 		defer res.Body.Close()
 		body, err = io.ReadAll(res.Body)
 		if err != nil {
-			log.Fatal(err)
+			pterm.Error.Println(err)
 			return
 		}
-		filename = strings.Split(c, "/")
-		if err := os.WriteFile(fmt.Sprintf("cpkgs/%s", filename[len(filename)-1]), body, 0777); err != nil {
-			log.Fatal(err)
+		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0777); err != nil {
+			pterm.Error.Println(err)
 			return
 		}
+		p.Increment()
 	}
+	pterm.Success.Println("Successfully installed all packages!")
 }
