@@ -27,9 +27,16 @@ func Uninstall() {
 		}
 	}
 	for _, pkg := range pkgs {
-		if !strings.HasSuffix(pkg, ".h") {
-			pterm.Warning.Printfln("%s is not a valid header file, skipping...", pkg)
-			continue
+		if JSON.Language == "C++" {
+			if !strings.HasSuffix(pkg, JSON.CPPExtensions.Header) {
+				pterm.Warning.Printfln("%s is not a valid header file, skipping...", pkg)
+				continue
+			}
+		} else {
+			if !strings.HasSuffix(pkg, ".h") {
+				pterm.Warning.Printfln("%s is not a valid header file, skipping...", pkg)
+				continue
+			}
 		}
 		s, _ := pterm.DefaultSpinner.Start(pterm.Sprintf("Removing package %s...\n", pkg))
 		if err := os.Remove(pterm.Sprintf("cpkgs/%s", pkg)); err != nil {

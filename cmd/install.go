@@ -45,12 +45,16 @@ func Install() {
 			return
 		}
 	}
-	if len(JSON.Include.H) <= 0 {
+	include := JSON.Include.H
+	if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
+		include = JSON.Include.HPP
+	}
+	if len(include) <= 0 {
 		pterm.Error.Println("No packages found!")
 		return
 	}
 	p, _ := pterm.DefaultProgressbar.WithTotal(len(JSON.Include.H)).WithTitle("Resolving packages...").Start()
-	for _, h := range JSON.Include.H {
+	for _, h := range include {
 		res, err := http.Get(h)
 		pkg := utils.At(strings.Split(h, "/"), -1)
 		p.UpdateTitle(pterm.Sprintf("Installing package %s...", pkg))
@@ -68,8 +72,13 @@ func Install() {
 			pterm.Error.Println(err)
 			return
 		}
-		c := strings.ReplaceAll(h, ".h", ".c")
-		res, err = http.Get(c)
+		var code string
+		if JSON.Language == "C++" {
+			code = strings.ReplaceAll(h, JSON.CPPExtensions.Header, JSON.CPPExtensions.Code)
+		} else {
+			code = strings.ReplaceAll(h, ".h", ".c")
+		}
+		res, err = http.Get(code)
 		if err != nil {
 			pterm.Error.Println(err)
 			return
@@ -80,7 +89,7 @@ func Install() {
 			pterm.Error.Println(err)
 			return
 		}
-		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(c, "/"), -1)), body, 0777); err != nil {
+		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0777); err != nil {
 			pterm.Error.Println(err)
 			return
 		}

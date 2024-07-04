@@ -14,17 +14,17 @@ import (
 )
 
 func Update() {
+	var JSON pkg.JSON
+	j, err := os.ReadFile("cpkgs.json")
+	if err != nil {
+		pterm.Error.Println(err)
+		return
+	}
+	json.Unmarshal(j, &JSON)
 	a := flag.Arg(1)
 	headers := flag.Args()[1:]
 	if a == "-a" || a == "--all" {
 		headers = []string{}
-		var JSON pkg.JSON
-		j, err := os.ReadFile("cpkgs.json")
-		if err != nil {
-			pterm.Error.Println(err)
-			return
-		}
-		json.Unmarshal(j, &JSON)
 		for _, h := range JSON.Include.H {
 			h := utils.At(strings.Split(h, "/"), -1)
 			headers = append(headers, h)
@@ -37,17 +37,17 @@ func Update() {
 		}
 	}
 	for _, header := range headers {
-		if !strings.HasSuffix(header, ".h") {
-			pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
-			continue
+		if JSON.Language == "C++" {
+			if !strings.HasSuffix(header, JSON.CPPExtensions.Header) {
+				pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
+				continue
+			}
+		} else {
+			if !strings.HasSuffix(header, ".h") {
+				pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
+				continue
+			}
 		}
-		var JSON pkg.JSON
-		j, err := os.ReadFile("cpkgs.json")
-		if err != nil {
-			pterm.Error.Println(err)
-			return
-		}
-		json.Unmarshal(j, &JSON)
 		include := JSON.Include.H
 		if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
 			include = JSON.Include.HPP

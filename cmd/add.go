@@ -71,11 +71,11 @@ func Add() {
 					continue
 				}
 			}
-			res, err := http.Get(pterm.Sprintf("%s/master/%s", urlString, utils.At(strings.Split(header, "/"), -1)))
+			res, err := http.Get(pterm.Sprintf("%s/master/%s", urlString, header))
 			if res.StatusCode != 200 || err != nil {
 				choice, _ := pterm.DefaultInteractiveConfirm.WithDefaultText("Before skipping this header file, do you want to try searching it in the include directory?").Show()
 				if choice {
-					res, err = http.Get(pterm.Sprintf("%s/master/include/%s", urlString, utils.At(strings.Split(header, "/"), -1)))
+					res, err = http.Get(pterm.Sprintf("%s/master/include/%s", urlString, header))
 					if res.StatusCode != 200 || err != nil {
 						pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
 						continue
@@ -97,7 +97,7 @@ func Add() {
 					return
 				}
 			}
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", header), body, 0777); err != nil {
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(header, "/"), -1)), body, 0777); err != nil {
 				pterm.Error.Println(err)
 				return
 			}
@@ -123,7 +123,7 @@ func Add() {
 				pterm.Error.Println(err)
 				return
 			}
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", code), body, 0777); err != nil {
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0777); err != nil {
 				pterm.Error.Println(err)
 				return
 			}

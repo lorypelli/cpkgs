@@ -10,6 +10,6 @@ func Help() {
 	cmd5 := "'cpkgs remove' - removes project directory\n"
 	cmd6 := "'cpkgs run <file-name>' - run the file name using your selected compiler\n"
 	cmd7 := "'cpkgs uninstall <package-name>' - removes the provided C package\n"
-	cmd8 := "'cpkgs update <package-name> [-a]' - updates the provided C package\n"
+	cmd8 := "'cpkgs update <package-name> [-a]' - updates the provided C package"
 	pterm.DefaultBox.WithTitle("List of all commands").WithTitleTopCenter().Print(cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8)
 }
