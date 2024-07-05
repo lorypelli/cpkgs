@@ -8,6 +8,14 @@
   "repository": {
     "url": "https://github.com/lorypelli/cpkgs"
   },
+  "files": [
+    "./cmd/",
+    "./pkg/",
+    "./src/",
+    "./utils/",
+    "go.mod",
+    "nodemon.json"
+  ],
   "keywords": [
     "go",
     "c",
