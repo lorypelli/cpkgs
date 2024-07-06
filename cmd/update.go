@@ -71,7 +71,7 @@ func Update() {
 					pterm.Error.Println(err)
 					return
 				}
-				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", fname), body, 0777); err != nil {
+				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", fname), body, 0644); err != nil {
 					pterm.Error.Println(err)
 					return
 				}
@@ -92,7 +92,7 @@ func Update() {
 					pterm.Error.Println(err)
 					return
 				}
-				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0777); err != nil {
+				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
 					pterm.Error.Println(err)
 					return
 				}

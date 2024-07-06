@@ -69,7 +69,7 @@ func Uninstall() {
 			pterm.Error.Println(err)
 			return
 		}
-		if err = os.WriteFile("cpkgs.json", j, 0777); err != nil {
+		if err = os.WriteFile("cpkgs.json", j, 0644); err != nil {
 			pterm.Error.Println(err)
 			return
 		}

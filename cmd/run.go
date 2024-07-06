@@ -38,13 +38,13 @@ func Run() {
 	}
 	fname := JSON.FileName
 	if _, err := os.Stat("cpkgs"); os.IsNotExist(err) {
-		if err := os.Mkdir("cpkgs", 0777); err != nil {
+		if err := os.Mkdir("cpkgs", 0755); err != nil {
 			pterm.Error.Println(err)
 			return
 		}
 	}
 	if _, err := os.Stat("cpkgs/bin"); os.IsNotExist(err) {
-		if err := os.Mkdir("cpkgs/bin", 0777); err != nil {
+		if err := os.Mkdir("cpkgs/bin", 0755); err != nil {
 			pterm.Error.Println(err)
 			return
 		}
