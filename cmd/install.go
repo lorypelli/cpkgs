@@ -40,7 +40,7 @@ func Install() {
 	}
 	pterm.Info.Println("Resolving packages...")
 	if _, err := os.Stat("cpkgs"); os.IsNotExist(err) {
-		if err := os.Mkdir("cpkgs", 0777); err != nil {
+		if err := os.Mkdir("cpkgs", 0755); err != nil {
 			pterm.Error.Println(err)
 			return
 		}
@@ -68,7 +68,7 @@ func Install() {
 			pterm.Error.Println(err)
 			return
 		}
-		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", pkg), body, 0777); err != nil {
+		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", pkg), body, 0644); err != nil {
 			pterm.Error.Println(err)
 			return
 		}
@@ -89,7 +89,7 @@ func Install() {
 			pterm.Error.Println(err)
 			return
 		}
-		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0777); err != nil {
+		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
 			pterm.Error.Println(err)
 			return
 		}

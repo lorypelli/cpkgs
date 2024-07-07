@@ -92,12 +92,12 @@ func Add() {
 				return
 			}
 			if _, err := os.Stat("cpkgs"); os.IsNotExist(err) {
-				if err := os.Mkdir("cpkgs", 0777); err != nil {
+				if err := os.Mkdir("cpkgs", 0755); err != nil {
 					pterm.Error.Println(err)
 					return
 				}
 			}
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(header, "/"), -1)), body, 0777); err != nil {
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(header, "/"), -1)), body, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}
@@ -123,7 +123,7 @@ func Add() {
 				pterm.Error.Println(err)
 				return
 			}
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0777); err != nil {
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}
@@ -137,7 +137,7 @@ func Add() {
 				pterm.Error.Println(err)
 				return
 			}
-			if err = os.WriteFile("cpkgs.json", j, 0777); err != nil {
+			if err = os.WriteFile("cpkgs.json", j, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}

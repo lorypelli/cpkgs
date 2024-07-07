@@ -1,0 +1,40 @@
+name: Create Release from Tag
+
+on:
+    push:
+        tags:
+            - v*.*.*
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@master
+            - name: Set up Go
+              uses: actions/setup-go@master
+              with:
+                  go-version: '1.22.5'
+            - name: Installing Packages
+              run: go mod tidy
+            - name: Build Project
+              run: make all
+            - name: Set up Node
+              uses: actions/setup-node@master
+              with:
+                  node-version: 'lts/*'
+                  registry-url: 'https://registry.npmjs.org'
+            - name: Publish Package
+              run: npm publish --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - name: Create Release
+              uses: softprops/action-gh-release@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Upload Assets
+              uses: alexellis/upload-assets@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  asset_paths: '["./bin/*"]'

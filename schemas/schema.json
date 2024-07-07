@@ -7,10 +7,7 @@
         },
         "language": {
             "type": "string",
-            "enum": [
-                "C",
-                "C++"
-            ]
+            "enum": ["C", "C++"]
         },
         "compiler": {
             "type": "string"
@@ -54,37 +51,17 @@
             "properties": {
                 "code": {
                     "type": "string",
-                    "enum": [
-                        ".cpp",
-                        ".cc",
-                        ".cxx",
-                        ".c++",
-                        ".cp"
-                    ]
+                    "enum": [".cpp", ".cc", ".cxx", ".c++", ".cp"]
                 },
                 "header": {
                     "type": "string",
-                    "enum": [
-                        ".h",
-                        ".hpp",
-                        ".hh",
-                        ".hxx",
-                        ".h++",
-                        ".hp"
-                    ]
+                    "enum": [".h", ".hpp", ".hh", ".hxx", ".h++", ".hp"]
                 }
             },
-            "required": [
-                "code",
-                "header"
-            ]
+            "required": ["code", "header"]
         }
     },
-    "required": [
-        "language",
-        "file_name",
-        "include"
-    ],
+    "required": ["language", "file_name", "include"],
     "if": {
         "properties": {
             "language": {
@@ -93,15 +70,11 @@
         }
     },
     "then": {
-        "required": [
-            "additional_cpp_options"
-        ]
+        "required": ["additional_cpp_options"]
     },
     "else": {
         "not": {
-            "required": [
-                "additional_cpp_options"
-            ]
+            "required": ["additional_cpp_options"]
         }
     }
 }

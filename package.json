@@ -1,33 +1,42 @@
 {
-  "name": "cpkgs",
-  "version": "1.0.0",
-  "description": "A CLI application to easily install C modules and run your code fast.",
-  "scripts": {
-    "dev": "nodemon"
-  },
-  "repository": {
-    "url": "https://github.com/lorypelli/cpkgs"
-  },
-  "files": [
-    "./cmd/",
-    "./pkg/",
-    "./src/",
-    "./utils/",
-    "go.mod",
-    "nodemon.json"
-  ],
-  "keywords": [
-    "go",
-    "c",
-    "package",
-    "packages",
-    "cli",
-    "cpkgs"
-  ],
-  "author": "LoryPelli",
-  "readme": "README.md",
-  "license": "MIT",
-  "devDependencies": {
-    "nodemon": "^3.1.4"
-  }
+    "name": "cpkgs",
+    "version": "1.0.0",
+    "description": "A CLI application to easily install C modules and run your code fast.",
+    "scripts": {
+        "dev": "nodemon",
+        "format": "prettier --write .",
+        "postinstall": "node scripts/index.js",
+        "start": "pnpm format && node scripts/index.js"
+    },
+    "type": "module",
+    "repository": {
+        "url": "https://github.com/lorypelli/cpkgs"
+    },
+    "files": [
+        "./cmd/",
+        "./pkg/",
+        "./src/",
+        "./utils/",
+        "go.mod",
+        "nodemon.json"
+    ],
+    "keywords": [
+        "go",
+        "c",
+        "package",
+        "packages",
+        "cli",
+        "cpkgs"
+    ],
+    "author": "LoryPelli",
+    "readme": "README.md",
+    "license": "MIT",
+    "devDependencies": {
+        "nodemon": "^3.1.4",
+        "prettier": "^3.3.2",
+        "prettier-plugin-organize-imports": "^4.0.0"
+    },
+    "dependencies": {
+        "chalk": "^5.3.0"
+    }
 }
