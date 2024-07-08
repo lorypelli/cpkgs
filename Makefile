@@ -1,5 +1,5 @@
 windows:
-	@GOOS=windows go build -o bin/cpkgs_windows.exe main.go
+	@GOOS=windows go build -o bin/cpkgs_win32.exe main.go
 linux:
 	@GOOS=linux go build -o bin/cpkgs_linux main.go
 darwin:
