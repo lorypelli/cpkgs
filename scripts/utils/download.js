@@ -1,5 +1,9 @@
 import chalk from 'chalk';
 
+/**
+ * @param { string } url
+ */
+
 export default async function download(url) {
     const res = await fetch(url);
     if (!res.ok) {
@@ -7,7 +11,7 @@ export default async function download(url) {
             chalk.bold.bgRed(' ERROR: '),
             chalk.bold.redBright(res.statusText),
         );
-        process.exit(1)
+        process.exit(1);
     }
     return Buffer.from(await res.arrayBuffer());
 }

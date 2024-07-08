@@ -11,6 +11,9 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@master
+              with:
+                ref: main
+                fetch-depth: 0
             - name: Set up Go
               uses: actions/setup-go@master
               with:
@@ -24,6 +27,18 @@ jobs:
               with:
                   node-version: 'lts/*'
                   registry-url: 'https://registry.npmjs.org'
+            - name: Update Package Version
+              run: |
+                VERSION=$(git describe --tags --abbrev=0)
+                npm version --no-git-tag-version $VERSION
+            - name: Push Changes
+              run: |
+                git checkout main
+                git config --global user.name 'github-actions[bot]'
+                git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+                git add package.json
+                git commit -m "Updating Version..."
+                git push
             - name: Publish Package
               run: npm publish --access public
               env:
