@@ -1,6 +1,6 @@
 {
     "name": "cpkgs",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "description": "A CLI application to easily install C modules and run your code fast.",
     "scripts": {
         "dev": "nodemon",
