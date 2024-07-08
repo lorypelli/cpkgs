@@ -1,4 +1,4 @@
-package pkg
+package internal
 
 type JSON struct {
 	Schema        string         `json:"$schema"`

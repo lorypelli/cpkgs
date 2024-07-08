@@ -6,12 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lorypelli/cpkgs/v2/pkg"
+	"github.com/lorypelli/cpkgs/v2/internal"
 	"github.com/pterm/pterm"
 )
 
 func Init() {
-	var JSON pkg.JSON
+	var JSON internal.JSON
 	dir, err := os.Getwd()
 	if err != nil {
 		pterm.Error.Println(err)
@@ -51,7 +51,7 @@ func Init() {
 	JSON.Language = language
 	JSON.Compiler = compiler
 	JSON.FileName = filename
-	JSON.Include = pkg.Include{
+	JSON.Include = internal.Include{
 		C:   []string{},
 		CPP: []string{},
 		H:   []string{},
@@ -63,7 +63,7 @@ func Init() {
 		pterm.Warning.Println("You selected C++ so you will need to provide additional options")
 		code, _ = pterm.DefaultInteractiveSelect.WithDefaultText("Provide code files extension").WithDefaultOption(".cpp").WithOptions([]string{".cpp", ".cc", ".cxx", ".c++", ".cp"}).Show()
 		header, _ = pterm.DefaultInteractiveSelect.WithDefaultText("Provide header files extension").WithDefaultOption(".h").WithOptions([]string{".h", ".hpp", ".hh", ".hxx", ".h++", ".hp"}).Show()
-		JSON.CPPExtensions = &pkg.CPPExtensions{
+		JSON.CPPExtensions = &internal.CPPExtensions{
 			Code:   code,
 			Header: header,
 		}

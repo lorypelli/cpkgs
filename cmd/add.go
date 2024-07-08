@@ -9,13 +9,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lorypelli/cpkgs/v2/pkg"
-	"github.com/lorypelli/cpkgs/v2/utils"
+	"github.com/lorypelli/cpkgs/v2/internal"
 	"github.com/pterm/pterm"
 )
 
 func Add() {
-	var JSON pkg.JSON
+	var JSON internal.JSON
 	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		pterm.Error.Println(err)
@@ -51,7 +50,7 @@ func Add() {
 				include = JSON.Include.HPP
 			}
 			for _, h := range include {
-				if header == utils.At(strings.Split(h, "/"), -1) {
+				if header == internal.At(strings.Split(h, "/"), -1) {
 					found = true
 					break
 				}
@@ -97,7 +96,7 @@ func Add() {
 					return
 				}
 			}
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(header, "/"), -1)), body, 0644); err != nil {
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", internal.At(strings.Split(header, "/"), -1)), body, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}
@@ -123,7 +122,7 @@ func Add() {
 				pterm.Error.Println(err)
 				return
 			}
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", internal.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}

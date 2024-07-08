@@ -8,13 +8,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lorypelli/cpkgs/v2/pkg"
-	"github.com/lorypelli/cpkgs/v2/utils"
+	"github.com/lorypelli/cpkgs/v2/internal"
 	"github.com/pterm/pterm"
 )
 
 func Update() {
-	var JSON pkg.JSON
+	var JSON internal.JSON
 	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		pterm.Error.Println(err)
@@ -26,7 +25,7 @@ func Update() {
 	if a == "-a" || a == "--all" {
 		headers = []string{}
 		for _, h := range JSON.Include.H {
-			h := utils.At(strings.Split(h, "/"), -1)
+			h := internal.At(strings.Split(h, "/"), -1)
 			headers = append(headers, h)
 		}
 	}
@@ -92,7 +91,7 @@ func Update() {
 					pterm.Error.Println(err)
 					return
 				}
-				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
+				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", internal.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
 					pterm.Error.Println(err)
 					return
 				}

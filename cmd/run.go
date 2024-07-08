@@ -9,12 +9,12 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/lorypelli/cpkgs/v2/pkg"
+	"github.com/lorypelli/cpkgs/v2/internal"
 	"github.com/pterm/pterm"
 )
 
 func Run() {
-	var JSON pkg.JSON
+	var JSON internal.JSON
 	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		pterm.Error.Println(err)

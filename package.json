@@ -15,8 +15,8 @@
     "files": [
         "./cmd/",
         "./pkg/",
-        "./src/",
-        "./utils/",
+        "./scripts/",
+        "main.go",
         "go.mod",
         "nodemon.json"
     ],

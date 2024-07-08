@@ -6,12 +6,15 @@ import (
 	"strings"
 
 	cmds "github.com/lorypelli/cpkgs/v2/cmd"
+	"github.com/pterm/pterm"
 )
 
 func main() {
 	flag.Parse()
 	cmd := flag.Arg(0)
 	if len(strings.TrimSpace(cmd)) <= 0 {
+		pterm.Info.Println("Welcome to cpkgs!")
+		pterm.Info.Println("Type 'cpkgs help' to see all avaible commands")
 		cmd = "install"
 	}
 	switch cmd {

@@ -10,13 +10,12 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/lorypelli/cpkgs/v2/pkg"
-	"github.com/lorypelli/cpkgs/v2/utils"
+	"github.com/lorypelli/cpkgs/v2/internal"
 	"github.com/pterm/pterm"
 )
 
 func Install() {
-	var JSON pkg.JSON
+	var JSON internal.JSON
 	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		pterm.Error.Println(err)
@@ -56,7 +55,7 @@ func Install() {
 	p, _ := pterm.DefaultProgressbar.WithTotal(len(JSON.Include.H)).WithTitle("Resolving packages...").Start()
 	for _, h := range include {
 		res, err := http.Get(h)
-		pkg := utils.At(strings.Split(h, "/"), -1)
+		pkg := internal.At(strings.Split(h, "/"), -1)
 		p.UpdateTitle(pterm.Sprintf("Installing package %s...", pkg))
 		if err != nil {
 			pterm.Error.Println(err)
@@ -89,7 +88,7 @@ func Install() {
 			pterm.Error.Println(err)
 			return
 		}
-		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", utils.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
+		if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", internal.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
 			pterm.Error.Println(err)
 			return
 		}

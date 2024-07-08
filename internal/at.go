@@ -1,4 +1,4 @@
-package utils
+package internal
 
 func At[T any](arr []T, n int) T {
 	len := len(arr)

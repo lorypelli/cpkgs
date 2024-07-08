@@ -6,13 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lorypelli/cpkgs/v2/pkg"
-	"github.com/lorypelli/cpkgs/v2/utils"
+	"github.com/lorypelli/cpkgs/v2/internal"
 	"github.com/pterm/pterm"
 )
 
 func Uninstall() {
-	var JSON pkg.JSON
+	var JSON internal.JSON
 	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		pterm.Error.Println(err)
@@ -49,7 +48,7 @@ func Uninstall() {
 		}
 		if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
 			for i, h := range JSON.Include.HPP {
-				header := utils.At(strings.Split(h, "/"), -1)
+				header := internal.At(strings.Split(h, "/"), -1)
 				if header == pkg {
 					JSON.Include.HPP = append(JSON.Include.HPP[:i], JSON.Include.HPP[i+1:]...)
 					JSON.Include.CPP = append(JSON.Include.CPP[:i], JSON.Include.CPP[i+1:]...)
@@ -57,7 +56,7 @@ func Uninstall() {
 			}
 		} else {
 			for i, h := range JSON.Include.H {
-				header := utils.At(strings.Split(h, "/"), -1)
+				header := internal.At(strings.Split(h, "/"), -1)
 				if header == pkg {
 					JSON.Include.H = append(JSON.Include.H[:i], JSON.Include.H[i+1:]...)
 					JSON.Include.C = append(JSON.Include.C[:i], JSON.Include.C[i+1:]...)
