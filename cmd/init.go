@@ -84,4 +84,9 @@ func Init() {
 	if err := os.RemoveAll("cpkgs"); err != nil {
 		pterm.Error.Println(err)
 	}
+	pterm.Info.Printfln("Creating cache directory at: %s...", internal.GetCacheDir())
+	if err := os.Mkdir(internal.GetCacheDir(), 0755); err != nil {
+		pterm.Error.Println(err)
+	}
+	pterm.Success.Println("Cache directory successfully created!")
 }
