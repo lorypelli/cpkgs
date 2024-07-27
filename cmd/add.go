@@ -36,7 +36,17 @@ func Add() {
 			pterm.Error.Println("Currently only github is supported!")
 			return
 		}
-		h, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Sprintf("Provide headers file to add from '%s'", strings.TrimSuffix(strings.TrimPrefix(strings.ReplaceAll(u.Path, u.Host, ""), "/"), "/"))).Show()
+		repo := strings.TrimSuffix(strings.TrimPrefix(strings.ReplaceAll(u.Path, u.Host, ""), "/"), "/")
+		h, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Sprintf("Provide headers file to add from '%s'", repo)).Show()
+		pterm.Info.Printfln("Creating cache for %s...", repo)
+		cacheRepo := pterm.Sprintf("%s/%s", internal.GetCacheDir(), repo)
+		if _, err := os.Stat(cacheRepo); os.IsNotExist(err) {
+			if err := os.Mkdir(cacheRepo, 0755); err != nil {
+				pterm.Error.Println(err)
+				return
+			}
+		}
+		pterm.Success.Printfln("Successfully created cache for %s!", repo)
 		u.Host = "raw.githubusercontent.com"
 		urlString := strings.ReplaceAll(u.String(), "/github.com", "")
 		if len(strings.TrimSpace(h)) <= 0 {
@@ -59,16 +69,9 @@ func Add() {
 				pterm.Warning.Println("Header file already exists, skipping...")
 				continue
 			}
-			if JSON.Language == "C++" {
-				if !strings.HasSuffix(header, JSON.CPPExtensions.Header) {
-					pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
-					continue
-				}
-			} else {
-				if !strings.HasSuffix(header, ".h") {
-					pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
-					continue
-				}
+			if (JSON.Language == "C++" && !strings.HasSuffix(header, JSON.CPPExtensions.Header)) || !strings.HasSuffix(header, ".h") {
+				pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
+				continue
 			}
 			res, err := http.Get(pterm.Sprintf("%s/master/%s", urlString, header))
 			if res.StatusCode != 200 || err != nil {
@@ -96,7 +99,12 @@ func Add() {
 					return
 				}
 			}
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", internal.At(strings.Split(header, "/"), -1)), body, 0644); err != nil {
+			headerFile := internal.At(strings.Split(header, "/"), -1)
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", headerFile), body, 0644); err != nil {
+				pterm.Error.Println(err)
+				return
+			}
+			if err := os.WriteFile(pterm.Sprintf("%s/%s", cacheRepo, headerFile), body, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}
@@ -122,7 +130,12 @@ func Add() {
 				pterm.Error.Println(err)
 				return
 			}
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", internal.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
+			codeFile := internal.At(strings.Split(header, "/"), -1)
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", codeFile), body, 0644); err != nil {
+				pterm.Error.Println(err)
+				return
+			}
+			if err := os.WriteFile(pterm.Sprintf("%s/%s", cacheRepo, codeFile), body, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}

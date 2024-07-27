@@ -36,16 +36,9 @@ func Update() {
 		}
 	}
 	for _, header := range headers {
-		if JSON.Language == "C++" {
-			if !strings.HasSuffix(header, JSON.CPPExtensions.Header) {
-				pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
-				continue
-			}
-		} else {
-			if !strings.HasSuffix(header, ".h") {
-				pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
-				continue
-			}
+		if (JSON.Language == "C++" && !strings.HasSuffix(header, JSON.CPPExtensions.Header)) || !strings.HasSuffix(header, ".h") {
+			pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
+			continue
 		}
 		include := JSON.Include.H
 		if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {

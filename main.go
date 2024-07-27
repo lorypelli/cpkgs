@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 	"strings"
 
 	cmds "github.com/lorypelli/cpkgs/v2/cmd"
@@ -60,7 +59,7 @@ func main() {
 		}
 	default:
 		{
-			log.Fatal("Unknown command, to see all avaible commands type: 'cpkgs help' ")
+			pterm.Error.Println("Unknown command, to see all avaible commands type: 'cpkgs help' ")
 			break
 		}
 	}
