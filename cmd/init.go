@@ -83,10 +83,12 @@ func Init() {
 	pterm.Info.Printfln("Filename -> %s", filename)
 	if err := os.RemoveAll("cpkgs"); err != nil {
 		pterm.Error.Println(err)
+		return
 	}
 	pterm.Info.Printfln("Creating cache directory at: %s...", internal.GetCacheDir())
 	if err := os.Mkdir(internal.GetCacheDir(), 0755); err != nil {
 		pterm.Error.Println(err)
+		return
 	}
 	pterm.Success.Println("Cache directory successfully created!")
 }

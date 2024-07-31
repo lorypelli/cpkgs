@@ -41,7 +41,7 @@ func Add() {
 		pterm.Info.Printfln("Creating cache for %s...", repo)
 		cacheRepo := pterm.Sprintf("%s/%s", internal.GetCacheDir(), repo)
 		if _, err := os.Stat(cacheRepo); os.IsNotExist(err) {
-			if err := os.Mkdir(cacheRepo, 0755); err != nil {
+			if err := os.MkdirAll(cacheRepo, 0755); err != nil {
 				pterm.Error.Println(err)
 				return
 			}
@@ -93,14 +93,14 @@ func Add() {
 				pterm.Error.Println(err)
 				return
 			}
-			if _, err := os.Stat("cpkgs"); os.IsNotExist(err) {
-				if err := os.Mkdir("cpkgs", 0755); err != nil {
+			if _, err := os.Stat(pterm.Sprintf("cpkgs/%s", repo)); os.IsNotExist(err) {
+				if err := os.MkdirAll(pterm.Sprintf("cpkgs/%s", repo), 0755); err != nil {
 					pterm.Error.Println(err)
 					return
 				}
 			}
 			headerFile := internal.At(strings.Split(header, "/"), -1)
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", headerFile), body, 0644); err != nil {
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s", repo, headerFile), body, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}
@@ -130,8 +130,8 @@ func Add() {
 				pterm.Error.Println(err)
 				return
 			}
-			codeFile := internal.At(strings.Split(header, "/"), -1)
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", codeFile), body, 0644); err != nil {
+			codeFile := internal.At(strings.Split(code, "/"), -1)
+			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s", repo, codeFile), body, 0644); err != nil {
 				pterm.Error.Println(err)
 				return
 			}

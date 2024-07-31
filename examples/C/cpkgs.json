@@ -1,14 +1,16 @@
 {
-    "$schema": "../../schemas/schema.json",
-    "language": "C",
-    "compiler": "gcc",
-    "file_name": "test",
-    "include": {
-        "C": [
-            "https://raw.githubusercontent.com/lorypelli/input_function/master/input.c"
-        ],
-        "H": [
-            "https://raw.githubusercontent.com/lorypelli/input_function/master/input.h"
-        ]
-    }
+  "$schema": "https://raw.githubusercontent.com/lorypelli/cpkgs/main/schemas/schema.json",
+  "language": "C",
+  "compiler": "gcc",
+  "file_name": "out",
+  "include": {
+    "C": [
+      "https://raw.githubusercontent.com/lorypelli/input_function/master/input.c"
+    ],
+    "C++": [],
+    "H": [
+      "https://raw.githubusercontent.com/lorypelli/input_function/master/input.h"
+    ],
+    "H++": []
+  }
 }
