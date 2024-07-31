@@ -86,9 +86,13 @@ func Init() {
 		return
 	}
 	pterm.Info.Printfln("Creating cache directory at: %s...", internal.GetCacheDir())
-	if err := os.Mkdir(internal.GetCacheDir(), 0755); err != nil {
-		pterm.Error.Println(err)
-		return
+	if _, err := os.Stat(internal.GetCacheDir()); os.IsNotExist(err) {
+		if err := os.Mkdir(internal.GetCacheDir(), 0755); err != nil {
+			pterm.Error.Println(err)
+			return
+		}
+		pterm.Success.Println("Cache directory successfully created!")
+	} else {
+		pterm.Warning.Println("Cache directory already exists, nothing was changed!")
 	}
-	pterm.Success.Println("Cache directory successfully created!")
 }

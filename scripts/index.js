@@ -14,7 +14,7 @@ console.log(
 );
 const dir =
     process.platform == 'win32'
-        ? `${process.env.APPDATA}/cpkgs`
+        ? `${process.env.APPDATA}/cpkgs/bin`
         : '/usr/local/bin/cpkgs';
 if (!existsSync(dir)) {
     console.log(

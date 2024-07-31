@@ -45,8 +45,10 @@ func Add() {
 				pterm.Error.Println(err)
 				return
 			}
+			pterm.Success.Printfln("Successfully created cache for %s!", repo)
+		} else {
+			pterm.Warning.Printfln("Cache for %s already exists, nothing was changed!", repo)
 		}
-		pterm.Success.Printfln("Successfully created cache for %s!", repo)
 		u.Host = "raw.githubusercontent.com"
 		urlString := strings.ReplaceAll(u.String(), "/github.com", "")
 		if len(strings.TrimSpace(h)) <= 0 {
@@ -73,45 +75,75 @@ func Add() {
 				pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
 				continue
 			}
-			res, err := http.Get(pterm.Sprintf("%s/master/%s", urlString, header))
-			if res.StatusCode != 200 || err != nil {
-				choice, _ := pterm.DefaultInteractiveConfirm.WithDefaultText("Before skipping this header file, do you want to try searching it in the include directory?").Show()
-				if choice {
-					res, err = http.Get(pterm.Sprintf("%s/master/include/%s", urlString, header))
-					if res.StatusCode != 200 || err != nil {
-						pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
-						continue
+			headerFile := internal.At(strings.Split(header, "/"), -1)
+			c, err := os.ReadFile(pterm.Sprintf("%s/%s", cacheRepo, headerFile))
+			if err == nil {
+				pterm.Warning.Println("Header file found in cache, use 'cpkgs update' command to refresh it!")
+				pterm.Info.Println("Adding from cache...")
+				if err := os.MkdirAll(pterm.Sprintf("cpkgs/%s", repo), 0755); err == nil {
+					if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s", repo, headerFile), c, 0644); err != nil {
+						pterm.Error.Println(err)
+						return
 					}
+					c, err = os.ReadFile(pterm.Sprintf("%s/%s_url.txt", cacheRepo, headerFile))
+					if err == nil {
+						if JSON.Language == "C++" {
+							JSON.Include.HPP = append(JSON.Include.HPP, string(c))
+						} else {
+							JSON.Include.H = append(JSON.Include.H, string(c))
+						}
+					} else {
+						pterm.Warning.Printfln("URL for %s not found!", header)
+					}
+					pterm.Success.Println("Successfully added from cache!")
 				} else {
-					pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
-					continue
-				}
-			}
-			defer res.Body.Close()
-			body, err := io.ReadAll(res.Body)
-			if err != nil {
-				pterm.Error.Println(err)
-				return
-			}
-			if _, err := os.Stat(pterm.Sprintf("cpkgs/%s", repo)); os.IsNotExist(err) {
-				if err := os.MkdirAll(pterm.Sprintf("cpkgs/%s", repo), 0755); err != nil {
 					pterm.Error.Println(err)
 					return
 				}
-			}
-			headerFile := internal.At(strings.Split(header, "/"), -1)
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s", repo, headerFile), body, 0644); err != nil {
-				pterm.Error.Println(err)
-				return
-			}
-			if err := os.WriteFile(pterm.Sprintf("%s/%s", cacheRepo, headerFile), body, 0644); err != nil {
-				pterm.Error.Println(err)
-				return
-			}
-			if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
-				JSON.Include.HPP = append(JSON.Include.HPP, res.Request.URL.String())
 			} else {
-				JSON.Include.H = append(JSON.Include.H, res.Request.URL.String())
+				res, err := http.Get(pterm.Sprintf("%s/master/%s", urlString, header))
+				if res.StatusCode != 200 || err != nil {
+					choice, _ := pterm.DefaultInteractiveConfirm.WithDefaultText("Before skipping this header file, do you want to try searching it in the include directory?").Show()
+					if choice {
+						res, err = http.Get(pterm.Sprintf("%s/master/include/%s", urlString, header))
+						if res.StatusCode != 200 || err != nil {
+							pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
+							continue
+						}
+					} else {
+						pterm.Error.Printf("Unable to get %s header file, skipping...\n", header)
+						continue
+					}
+				}
+				defer res.Body.Close()
+				body, err := io.ReadAll(res.Body)
+				if err != nil {
+					pterm.Error.Println(err)
+					return
+				}
+				if _, err := os.Stat(pterm.Sprintf("cpkgs/%s", repo)); os.IsNotExist(err) {
+					if err := os.MkdirAll(pterm.Sprintf("cpkgs/%s", repo), 0755); err != nil {
+						pterm.Error.Println(err)
+						return
+					}
+				}
+				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s", repo, headerFile), body, 0644); err != nil {
+					pterm.Error.Println(err)
+					return
+				}
+				if err := os.WriteFile(pterm.Sprintf("%s/%s", cacheRepo, headerFile), body, 0644); err != nil {
+					pterm.Error.Println(err)
+					return
+				}
+				if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
+					JSON.Include.HPP = append(JSON.Include.HPP, res.Request.URL.String())
+				} else {
+					JSON.Include.H = append(JSON.Include.H, res.Request.URL.String())
+				}
+				if err := os.WriteFile(pterm.Sprintf("%s/%s_url.txt", cacheRepo, headerFile), []byte(res.Request.URL.String()), 0644); err != nil {
+					pterm.Error.Println(err)
+					return
+				}
 			}
 			var code string
 			if JSON.Language == "C++" {
@@ -119,30 +151,60 @@ func Add() {
 			} else {
 				code = strings.ReplaceAll(header, ".h", ".c")
 			}
-			res, err = http.Get(pterm.Sprintf("%s/master/%s", urlString, code))
-			for res.StatusCode != 200 || err != nil {
-				dir, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("Code file not found, please provide directory").Show()
-				res, err = http.Get(pterm.Sprintf("%s/master/%s/%s", u.String(), dir, header))
-			}
-			defer res.Body.Close()
-			body, err = io.ReadAll(res.Body)
-			if err != nil {
-				pterm.Error.Println(err)
-				return
-			}
 			codeFile := internal.At(strings.Split(code, "/"), -1)
-			if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s", repo, codeFile), body, 0644); err != nil {
-				pterm.Error.Println(err)
-				return
-			}
-			if err := os.WriteFile(pterm.Sprintf("%s/%s", cacheRepo, codeFile), body, 0644); err != nil {
-				pterm.Error.Println(err)
-				return
-			}
-			if JSON.Language == "C++" {
-				JSON.Include.CPP = append(JSON.Include.CPP, res.Request.URL.String())
+			c, err = os.ReadFile(pterm.Sprintf("%s/%s", cacheRepo, codeFile))
+			if err == nil {
+				pterm.Warning.Println("Code file found in cache, use 'cpkgs update' command to refresh it!")
+				pterm.Info.Println("Adding from cache...")
+				if err := os.MkdirAll(pterm.Sprintf("cpkgs/%s", repo), 0755); err == nil {
+					if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s", repo, codeFile), c, 0644); err != nil {
+						pterm.Error.Println(err)
+						return
+					}
+					c, err = os.ReadFile(pterm.Sprintf("%s/%s_url.txt", cacheRepo, codeFile))
+					if err == nil {
+						if JSON.Language == "C++" {
+							JSON.Include.CPP = append(JSON.Include.CPP, string(c))
+						} else {
+							JSON.Include.C = append(JSON.Include.C, string(c))
+						}
+					} else {
+						pterm.Warning.Printfln("URL for %s not found!", code)
+					}
+					pterm.Success.Println("Successfully added from cache!")
+				} else {
+					pterm.Error.Println(err)
+					return
+				}
 			} else {
-				JSON.Include.C = append(JSON.Include.C, res.Request.URL.String())
+				res, err := http.Get(pterm.Sprintf("%s/master/%s", urlString, code))
+				for res.StatusCode != 200 || err != nil {
+					dir, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("Code file not found, please provide directory").Show()
+					res, err = http.Get(pterm.Sprintf("%s/master/%s/%s", urlString, dir, code))
+				}
+				defer res.Body.Close()
+				body, err := io.ReadAll(res.Body)
+				if err != nil {
+					pterm.Error.Println(err)
+					return
+				}
+				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s", repo, codeFile), body, 0644); err != nil {
+					pterm.Error.Println(err)
+					return
+				}
+				if err := os.WriteFile(pterm.Sprintf("%s/%s", cacheRepo, codeFile), body, 0644); err != nil {
+					pterm.Error.Println(err)
+					return
+				}
+				if JSON.Language == "C++" {
+					JSON.Include.CPP = append(JSON.Include.CPP, res.Request.URL.String())
+				} else {
+					JSON.Include.C = append(JSON.Include.C, res.Request.URL.String())
+				}
+				if err := os.WriteFile(pterm.Sprintf("%s/%s_url.txt", cacheRepo, codeFile), []byte(res.Request.URL.String()), 0644); err != nil {
+					pterm.Error.Println(err)
+					return
+				}
 			}
 			j, err := json.MarshalIndent(JSON, "", "  ")
 			if err != nil {
