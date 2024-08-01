@@ -12,6 +12,9 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.2
+        version: 22.0.2
       nodemon:
         specifier: ^3.1.4
         version: 3.1.4
@@ -23,6 +26,9 @@ importers:
         version: 4.0.0(prettier@3.3.3)(typescript@5.5.4)
 
 packages:
+
+  '@types/node@22.0.2':
+    resolution: {integrity: sha512-yPL6DyFwY5PiMVEwymNeqUTKsDczQBJ/5T7W/46RwLU/VH+AA8aT5TZkvBviLKLbbm0hlfftEkGrNzfRk/fofQ==}
 
   anymatch@3.1.3:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
@@ -53,8 +59,8 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-  debug@4.3.5:
-    resolution: {integrity: sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==}
+  debug@4.3.6:
+    resolution: {integrity: sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==}
     engines: {node: '>=6.0'}
     peerDependencies:
       supports-color: '*'
@@ -171,7 +177,14 @@ packages:
   undefsafe@2.0.5:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
 
+  undici-types@6.11.1:
+    resolution: {integrity: sha512-mIDEX2ek50x0OlRgxryxsenE5XaQD4on5U2inY7RApK3SOJpofyw7uW2AyfMKkhAxXIceo2DeWGVGwyvng1GNQ==}
+
 snapshots:
+
+  '@types/node@22.0.2':
+    dependencies:
+      undici-types: 6.11.1
 
   anymatch@3.1.3:
     dependencies:
@@ -207,7 +220,7 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  debug@4.3.5(supports-color@5.5.0):
+  debug@4.3.6(supports-color@5.5.0):
     dependencies:
       ms: 2.1.2
     optionalDependencies:
@@ -249,7 +262,7 @@ snapshots:
   nodemon@3.1.4:
     dependencies:
       chokidar: 3.6.0
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.6(supports-color@5.5.0)
       ignore-by-default: 1.0.1
       minimatch: 3.1.2
       pstree.remy: 1.1.8
@@ -295,3 +308,5 @@ snapshots:
   typescript@5.5.4: {}
 
   undefsafe@2.0.5: {}
+
+  undici-types@6.11.1: {}
