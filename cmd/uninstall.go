@@ -39,20 +39,22 @@ func Uninstall() {
 			pterm.Error.Println(err)
 			return
 		}
+		include := JSON.Include.H
 		if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
-			for i, h := range JSON.Include.HPP {
-				header := internal.At(strings.Split(h, "/"), -1)
-				if header == pkg {
-					JSON.Include.HPP = append(JSON.Include.HPP[:i], JSON.Include.HPP[i+1:]...)
+			include = JSON.Include.HPP
+		}
+		for i, h := range include {
+			if internal.At(strings.Split(h, "/"), -1) == internal.At(strings.Split(pkg, "/"), -1) {
+				if JSON.Language == "C++" {
 					JSON.Include.CPP = append(JSON.Include.CPP[:i], JSON.Include.CPP[i+1:]...)
-				}
-			}
-		} else {
-			for i, h := range JSON.Include.H {
-				header := internal.At(strings.Split(h, "/"), -1)
-				if header == pkg {
-					JSON.Include.H = append(JSON.Include.H[:i], JSON.Include.H[i+1:]...)
+					if JSON.CPPExtensions.Header != ".h" {
+						JSON.Include.HPP = append(JSON.Include.HPP[:i], JSON.Include.HPP[i+1:]...)
+					} else {
+						JSON.Include.H = append(JSON.Include.H[:i], JSON.Include.H[i+1:]...)
+					}
+				} else {
 					JSON.Include.C = append(JSON.Include.C[:i], JSON.Include.C[i+1:]...)
+					JSON.Include.H = append(JSON.Include.H[:i], JSON.Include.H[i+1:]...)
 				}
 			}
 		}
