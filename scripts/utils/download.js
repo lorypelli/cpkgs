@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { error } from './logs.js';
 
 /**
  * @param { string } url
@@ -7,11 +7,7 @@ import chalk from 'chalk';
 export default async function download(url) {
     const res = await fetch(url);
     if (!res.ok) {
-        console.log(
-            chalk.bold.bgRed('  ERROR  '),
-            chalk.bold.redBright(res.statusText),
-        );
-        process.exit(1);
+        error(res.statusText);
     }
     return Buffer.from(await res.arrayBuffer());
 }
