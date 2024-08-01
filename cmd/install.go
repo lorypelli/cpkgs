@@ -52,7 +52,7 @@ func Install() {
 		pterm.Error.Println("No packages found!")
 		return
 	}
-	p, _ := pterm.DefaultProgressbar.WithTotal(len(JSON.Include.H)).WithTitle("Resolving packages...").Start()
+	p, _ := pterm.DefaultProgressbar.WithTotal(len(include)).WithTitle("Resolving packages...").Start()
 	for _, h := range include {
 		res, err := http.Get(h)
 		pkg := internal.At(strings.Split(h, "/"), -1)
