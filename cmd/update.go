@@ -22,9 +22,13 @@ func Update() {
 	json.Unmarshal(j, &JSON)
 	a := flag.Arg(1)
 	headers := flag.Args()[1:]
+	include := JSON.Include.H
+	if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
+		include = JSON.Include.HPP
+	}
 	if a == "-a" || a == "--all" {
 		headers = []string{}
-		for _, h := range JSON.Include.H {
+		for _, h := range include {
 			h := internal.At(strings.Split(h, "/"), -1)
 			headers = append(headers, h)
 		}
@@ -40,18 +44,13 @@ func Update() {
 			pterm.Warning.Printfln("%s is not a valid header file, skipping...", header)
 			continue
 		}
-		include := JSON.Include.H
-		if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
-			include = JSON.Include.HPP
-		}
 		for _, h := range include {
-			f := strings.Split(h, "/")
-			fname := f[len(f)-1]
-			if fname == header || a == "-a" || a == "--all" {
+			f := internal.At(strings.Split(h, "/"), -1)
+			if f == header || a == "-a" || a == "--all" {
 				if a == "-a" || a == "--all" {
-					fname = header
+					f = header
 				}
-				s, _ := pterm.DefaultSpinner.Start(pterm.Sprintf("Updating header file %s...", fname))
+				s, _ := pterm.DefaultSpinner.Start(pterm.Sprintf("Updating header file %s...", f))
 				res, err := http.Get(h)
 				if err != nil {
 					pterm.Error.Println(err)
@@ -63,7 +62,7 @@ func Update() {
 					pterm.Error.Println(err)
 					return
 				}
-				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", fname), body, 0644); err != nil {
+				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", f), body, 0644); err != nil {
 					pterm.Error.Println(err)
 					return
 				}
@@ -88,7 +87,7 @@ func Update() {
 					pterm.Error.Println(err)
 					return
 				}
-				s.Success(pterm.Sprintf("Successfully updated header file %s...\n", fname))
+				s.Success(pterm.Sprintf("Successfully updated header file %s...\n", f))
 			}
 		}
 	}
