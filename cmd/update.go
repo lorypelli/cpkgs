@@ -20,7 +20,7 @@ func Update() {
 		return
 	}
 	json.Unmarshal(j, &JSON)
-	a := flag.Arg(1)
+	a := strings.ToLower(flag.Arg(1))
 	headers := flag.Args()[1:]
 	include := JSON.Include.H
 	if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {

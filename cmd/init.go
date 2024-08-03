@@ -17,10 +17,10 @@ func Init() {
 		pterm.Error.Println(err)
 		return
 	}
-	d := flag.Arg(1)
+	d := strings.ToLower(flag.Arg(1))
 	if d != "-d" && d != "--default" && len(strings.TrimSpace(d)) > 0 {
 		dir = flag.Arg(1)
-		d = flag.Arg(2)
+		d = strings.ToLower(flag.Arg(2))
 	}
 	var language, compiler, filename string
 	if d != "-d" && d != "--default" {

@@ -17,7 +17,7 @@ func main() {
 		cmd = "install"
 	}
 	switch cmd {
-	case "add":
+	case "add", "get":
 		{
 			cmds.Add()
 			break
@@ -52,7 +52,7 @@ func main() {
 			cmds.Uninstall()
 			break
 		}
-	case "update":
+	case "update", "up":
 		{
 			cmds.Update()
 			break
