@@ -5,8 +5,8 @@
     "scripts": {
         "dev": "nodemon",
         "format": "prettier --write .",
-        "postinstall": "node scripts/index.js",
-        "start": "pnpm format && node scripts/index.js"
+        "postinstall": "node scripts/install.js",
+        "preuninstall": "node scripts/uninstall.js"
     },
     "type": "module",
     "repository": {
