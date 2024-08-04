@@ -49,11 +49,11 @@ func Add() {
 		} else {
 			pterm.Warning.Printfln("Cache for %s already exists, nothing was changed!", repo)
 		}
-		u.Host = "raw.githubusercontent.com"
-		urlString := strings.ReplaceAll(u.String(), "/github.com", "")
 		if len(strings.TrimSpace(h)) <= 0 {
 			continue
 		}
+		u.Host = "raw.githubusercontent.com"
+		urlString := strings.ReplaceAll(u.String(), strings.TrimPrefix("github.com", "/"), "")
 		headers := strings.Split(h, " ")
 		for _, header := range headers {
 			found := false
@@ -91,6 +91,10 @@ func Add() {
 							JSON.Include.HPP = append(JSON.Include.HPP, string(c))
 						} else {
 							JSON.Include.H = append(JSON.Include.H, string(c))
+						}
+						if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s_url.txt", repo, headerFile), c, 0644); err != nil {
+							pterm.Error.Println(err)
+							return
 						}
 					} else {
 						pterm.Warning.Printfln("URL for %s not found!", header)
@@ -144,6 +148,10 @@ func Add() {
 					pterm.Error.Println(err)
 					return
 				}
+				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s_url.txt", repo, headerFile), []byte(res.Request.URL.String()), 0644); err != nil {
+					pterm.Error.Println(err)
+					return
+				}
 			}
 			var code string
 			if JSON.Language == "C++" {
@@ -167,6 +175,10 @@ func Add() {
 							JSON.Include.CPP = append(JSON.Include.CPP, string(c))
 						} else {
 							JSON.Include.C = append(JSON.Include.C, string(c))
+						}
+						if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s_url.txt", repo, codeFile), c, 0644); err != nil {
+							pterm.Error.Println(err)
+							return
 						}
 					} else {
 						pterm.Warning.Printfln("URL for %s not found!", code)
@@ -201,7 +213,11 @@ func Add() {
 				} else {
 					JSON.Include.C = append(JSON.Include.C, res.Request.URL.String())
 				}
-				if err := os.WriteFile(pterm.Sprintf("%s/%s_url.txt", cacheRepo, codeFile), []byte(res.Request.URL.String()), 0644); err != nil {
+				if err := os.WriteFile(pterm.Sprintf("%s/%s_url.txt", repo, codeFile), []byte(res.Request.URL.String()), 0644); err != nil {
+					pterm.Error.Println(err)
+					return
+				}
+				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s/%s_url.txt", repo, codeFile), []byte(res.Request.URL.String()), 0644); err != nil {
 					pterm.Error.Println(err)
 					return
 				}
