@@ -213,7 +213,7 @@ func Add() {
 				} else {
 					JSON.Include.C = append(JSON.Include.C, res.Request.URL.String())
 				}
-				if err := os.WriteFile(pterm.Sprintf("%s/%s_url.txt", repo, codeFile), []byte(res.Request.URL.String()), 0644); err != nil {
+				if err := os.WriteFile(pterm.Sprintf("%s/%s_url.txt", cacheRepo, codeFile), []byte(res.Request.URL.String()), 0644); err != nil {
 					pterm.Error.Println(err)
 					return
 				}
