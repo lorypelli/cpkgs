@@ -64,7 +64,7 @@ func Run() {
 		return
 	}
 	cmd += pterm.Sprintf(" && ./cpkgs/bin/%s", JSON.FileName)
-	cmdExec := exec.Command("sh", "-c", cmd)
+	cmdExec := exec.Command("bash", "-c", cmd)
 	if runtime.GOOS == "windows" {
 		cmdExec = exec.Command("cmd", "/C", cmd)
 	}
