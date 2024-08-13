@@ -2,5 +2,4 @@
 *.exe~
 package-lock.json
 node_modules
-test
 bin

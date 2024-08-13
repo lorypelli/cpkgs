@@ -1,6 +1,6 @@
 module github.com/lorypelli/cpkgs/v2
 
-go 1.22.5
+go 1.22.6
 
 require github.com/pterm/pterm v0.12.79
 
