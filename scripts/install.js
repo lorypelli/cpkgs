@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync } from 'node:fs';
 import { dir, extension, file } from './utils/constants.js';
 import create from './utils/create.js';
 import download from './utils/download.js';

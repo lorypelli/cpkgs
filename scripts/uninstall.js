@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync } from 'node:fs';
 import { file } from './utils/constants.js';
 import { info, success, warning } from './utils/logs.js';
 import remove from './utils/remove.js';
