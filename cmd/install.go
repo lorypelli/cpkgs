@@ -26,7 +26,7 @@ func Install() {
 		if pkgs := flag.Args()[1:]; len(pkgs) > 0 {
 			pterm.Warning.Println("You provided arguments to the command, 'cpkgs add' will be executed instead!")
 			cmd := pterm.Sprintf("cpkgs add %s", strings.Join(pkgs, " "))
-			cmdExec := exec.Command("bash", "-c", cmd)
+			cmdExec := exec.Command("sh", "-c", cmd)
 			if runtime.GOOS == "windows" {
 				cmdExec = exec.Command("cmd", "/C", cmd)
 			}

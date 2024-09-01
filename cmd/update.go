@@ -17,7 +17,7 @@ func Update() {
 	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		pterm.Error.Println(err)
-		return
+		os.Exit(1)
 	}
 	json.Unmarshal(j, &JSON)
 	a := strings.ToLower(flag.Arg(1))
@@ -54,17 +54,17 @@ func Update() {
 				res, err := http.Get(h)
 				if err != nil {
 					pterm.Error.Println(err)
-					return
+					os.Exit(1)
 				}
 				defer res.Body.Close()
 				body, err := io.ReadAll(res.Body)
 				if err != nil {
 					pterm.Error.Println(err)
-					return
+					os.Exit(1)
 				}
 				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", f), body, 0644); err != nil {
 					pterm.Error.Println(err)
-					return
+					os.Exit(1)
 				}
 				var code string
 				if JSON.Language == "C++" {
@@ -75,17 +75,17 @@ func Update() {
 				res, err = http.Get(code)
 				if err != nil {
 					pterm.Error.Println(err)
-					return
+					os.Exit(1)
 				}
 				defer res.Body.Close()
 				body, err = io.ReadAll(res.Body)
 				if err != nil {
 					pterm.Error.Println(err)
-					return
+					os.Exit(1)
 				}
 				if err := os.WriteFile(pterm.Sprintf("cpkgs/%s", internal.At(strings.Split(code, "/"), -1)), body, 0644); err != nil {
 					pterm.Error.Println(err)
-					return
+					os.Exit(1)
 				}
 				s.Success(pterm.Sprintf("Successfully updated header file %s...\n", f))
 			}

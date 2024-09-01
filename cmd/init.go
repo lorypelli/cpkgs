@@ -15,7 +15,7 @@ func Init() {
 	dir, err := os.Getwd()
 	if err != nil {
 		pterm.Error.Println(err)
-		return
+		os.Exit(1)
 	}
 	d := strings.ToLower(flag.Arg(1))
 	if d != "-d" && d != "--default" && len(strings.TrimSpace(d)) > 0 {
@@ -44,7 +44,7 @@ func Init() {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		if err := os.Mkdir(dir, 0755); err != nil {
 			pterm.Error.Println(err)
-			return
+			os.Exit(1)
 		}
 	}
 	JSON.Schema = "https://raw.githubusercontent.com/lorypelli/cpkgs/main/schemas/schema.json"
@@ -71,11 +71,11 @@ func Init() {
 	j, err := json.MarshalIndent(JSON, "", "  ")
 	if err != nil {
 		pterm.Error.Println(err)
-		return
+		os.Exit(1)
 	}
 	if err := os.WriteFile(pterm.Sprintf("%s/cpkgs.json", dir), j, 0644); err != nil {
 		pterm.Error.Println(err)
-		return
+		os.Exit(1)
 	}
 	pterm.Success.Println("Successfully created cpkgs.json file with the following settings:")
 	pterm.Info.Printfln("Language -> %s", language)
@@ -83,13 +83,13 @@ func Init() {
 	pterm.Info.Printfln("Filename -> %s", filename)
 	if err := os.RemoveAll("cpkgs"); err != nil {
 		pterm.Error.Println(err)
-		return
+		os.Exit(1)
 	}
 	pterm.Info.Printfln("Creating cache directory at: %s...", internal.GetCacheDir())
 	if _, err := os.Stat(internal.GetCacheDir()); os.IsNotExist(err) {
 		if err := os.Mkdir(internal.GetCacheDir(), 0755); err != nil {
 			pterm.Error.Println(err)
-			return
+			os.Exit(1)
 		}
 		pterm.Success.Println("Cache directory successfully created!")
 	} else {

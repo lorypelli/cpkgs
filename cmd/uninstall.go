@@ -15,7 +15,7 @@ func Uninstall() {
 	j, err := os.ReadFile("cpkgs.json")
 	if err != nil {
 		pterm.Error.Println(err)
-		return
+		os.Exit(1)
 	}
 	json.Unmarshal(j, &JSON)
 	pkgs := flag.Args()[1:]
@@ -33,11 +33,11 @@ func Uninstall() {
 		s, _ := pterm.DefaultSpinner.Start(pterm.Sprintf("Removing package %s...\n", pkg))
 		if err := os.Remove(pterm.Sprintf("cpkgs/%s", pkg)); err != nil {
 			pterm.Error.Println(err)
-			return
+			os.Exit(1)
 		}
 		if err := os.Remove(pterm.Sprintf("cpkgs/%s", strings.ReplaceAll(pkg, ".h", ".c"))); err != nil {
 			pterm.Error.Println(err)
-			return
+			os.Exit(1)
 		}
 		include := JSON.Include.H
 		if JSON.Language == "C++" && JSON.CPPExtensions.Header != ".h" {
@@ -61,11 +61,11 @@ func Uninstall() {
 		j, err := json.MarshalIndent(JSON, "", "  ")
 		if err != nil {
 			pterm.Error.Println(err)
-			return
+			os.Exit(1)
 		}
 		if err = os.WriteFile("cpkgs.json", j, 0644); err != nil {
 			pterm.Error.Println(err)
-			return
+			os.Exit(1)
 		}
 		s.Success(pterm.Sprintf("Successfully removed package %s!", pkg))
 	}
